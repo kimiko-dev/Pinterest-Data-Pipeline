@@ -42,4 +42,28 @@ Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is loc
 ### 1.4 Create Kafka Topics
 ---------------------------
 
-Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__
+Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__, clicked on the appropriate __cluster__ and clicked on __View client information__. The `Bootstrap servers string` was in the __Bootstrap servers__ box, in the __Private endpoint (single-VPC)__ column. Scrolling down, I found the `Plaintext Apache Zookeeper connection string` in the __Apache ZooKeeper connection__, where I copied the _Plaintext_ string. 
+
+Now we can create the three following topics:
+- `<your_UserId>.pin` for the Pinterest posts data
+- `<your_UserId>.geo` for the post geolocation data
+- `<your_UserId>.user` for the post user data
+
+To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8.1/bin`, then wrote the following command `./kafka-console-producer.sh --bootstrap-server <BootstrapServerString> --producer.config client.properties --group students --topic <topic_name>`. Where I made sure to replace the `BootstrapServerString` with the one I obtained previously, and also replaced `<topic_name>` appropriately (we need to make 3 topics, so I used this command three times each with the desired topic names.)
+
+## 2. Connect a MSK Cluster to a S3 Bucket
+------------------------------------------
+
+### 2.1 Create a Custom Plugin with MSK Connect
+-------------------------------------------------
+
+Firstly, I need to go to the __S3 console__ and find the correct bucket. It is named `user-<my_UserId>-bucket`, and I made a note of the name.
+
+Now, on my __EC2 client__, I downloaded the __Confluent.io Amazon S3 Connector__. To do this, I simply used to command `wget https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.0.3/confluentinc-kafka-connect-s3-10.0.3.zip`. Next, I need to move it to the correct __S3 bucket__. This was easy to do, I simply entered the command `aws s3 cp ./confluentinc-kafka-connect-s3-10.0.3.zip s3://<bucket_name>/kafka-connect-s3/`, where I replaced `<bucket_name>` with the one I obtained earlier.
+
+I then navigated to the __Amazon MSK__ console, and clicked on __Create customised plugin__ under the __MSK Connect__ section. Here, I entered the __S3 URI__ `s3://<bucket_name>/kafka-connect-s3/confluentinc-kafka-connect-s3-10.0.3.zip`, again changing `<bucket_name>` to the correct one. I then had to name it `<your_UserId>-plugin`, since my account only had permissions to create a plugin called this.
+
+### 2.2 Create a Connector with MSK
+-----------------------------------
+
+Going back to the __Amazon MSK__ console, I clicked on __Connectors__
