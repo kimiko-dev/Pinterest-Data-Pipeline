@@ -1,18 +1,23 @@
 # Pinterest Data Pipeline Journal
+---------------------------------
 
-## 1. Configuring the EC2 Kafka Client
+## 1. Introduction
+------------------
 
-### 1.1 Create a `.pem` Key File Locally
+## 2. Configuring the EC2 Kafka Client
+--------------------------------------
+
+### 2.1 Create a `.pem` Key File Locally
 ----------------------------------------
 
 Upon signing into my AWS account, I navigated to the __Parameter Store__. I searched the parameters ussing my `SSH Keypair ID`. Under __Parameter details__, I found the and decrypted the `Value`, revealing an _RSA private key_. I copied and pasted this key into a new `.pem` file, making sure this was created in the correct folder I wanted to connect to the __EC2 instance__ in. However, we need to name this file as `<Key pair assigned at launch>.pem`. To identify the `Key pair assigned at launch`, I went to the __Instances__ section located in the __EC2 Service__. I found the correct instance by referencing my __AWS IAM Username__, and then accessed the __instance summary__. In the __details__ section, I found `Key pair assigned at launch`, which I copy and pasted as the filename.
 
-### 1.2 Connect to the EC2 Instance
+### 2.2 Connect to the EC2 Instance
 -----------------------------------
 
 I needed to connect to the __EC2 instance__ on an __SSH client__. I am using __WSL__, and I am using the `OpenSSH` client. To install the `OpenSSH` client, I simply wrote the command `sudo apt-get install openssh-client` in a __WSL__ terminal. After confirming I was in the same folder where the `.pem` file is stored, I ran the command `chmod 400 <Key pair assigned at launch>.pem` to make sure the file had been set to the correct permissions. Then I ran `ssh -i "<Key pair assigned at launch>.pem" root@<Public IPv4 DNS>`, which connected me to the __EC2 instance__. 
 
-### 1.3 Set Up Kafka on the EC2 Client
+### 2.3 Set Up Kafka on the EC2 Client
 --------------------------------------
 
 I need to download and install __Kafka__ on my __client EC2 machine__. I have already been proivded with access to an __IAM authenticated MSK cluster__, so I did not have to do this in the project. On the __EC2 client__, I first had to install __Java__, with following command `sudo yum install java-1.8.0`. Since the cluster I was using was running on __Kafka 2.12-2.8.1__, I had to make sure that I dowloaded the correct version of __Kafka__ on my __client EC2 machine__. The command for this is: `wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz`. With the file downloaded, I then used `tar -xzf kafka_2.12-2.8.1.tgz` to extract all the files needed for __Kafka__. 
@@ -39,7 +44,7 @@ where I replaced `<my ARN>` with the __ARN__ I noted down before.
 
 Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is located at `/home/ec2-user/.bashrc`. When editing, I added the line: `export CLASSPATH=/home/ec2-user/kafka_2.12-2.8.1/libs/aws-msk-iam-auth-1.1.5-all.jar`. Also, while I was here, I made sure to add in `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.382.b05-1.amzn2.0.2.x86_64/jre` too. To make sure the environment variables were set correctly, I wrote the following commands `echo $CLASSPATH` and `echo $JAVA_HOME`
 
-### 1.4 Create Kafka Topics
+### 2.4 Create Kafka Topics
 ---------------------------
 
 Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__, clicked on the appropriate __cluster__ and clicked on __View client information__. The `Bootstrap servers string` was in the __Bootstrap servers__ box, in the __Private endpoint (single-VPC)__ column. Scrolling down, I found the `Plaintext Apache Zookeeper connection string` in the __Apache ZooKeeper connection__, where I copied the _Plaintext_ string. 
@@ -51,10 +56,10 @@ Now we can create the three following topics:
 
 To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8.1/bin`, then wrote the following command `./kafka-console-producer.sh --bootstrap-server <BootstrapServerString> --producer.config client.properties --group students --topic <topic_name>`. Where I made sure to replace the `BootstrapServerString` with the one I obtained previously, and also replaced `<topic_name>` appropriately (we need to make 3 topics, so I used this command three times each with the desired topic names.)
 
-## 2. Connect a MSK Cluster to a S3 Bucket
+## 3. Connect a MSK Cluster to a S3 Bucket
 ------------------------------------------
 
-### 2.1 Create a Custom Plugin with MSK Connect
+### 3.1 Create a Custom Plugin with MSK Connect
 -------------------------------------------------
 
 Firstly, I need to go to the __S3 console__ and find the correct bucket. It is named `user-<my_UserId>-bucket`, and I made a note of the name.
@@ -63,7 +68,40 @@ Now, on my __EC2 client__, I downloaded the __Confluent.io Amazon S3 Connector__
 
 I then navigated to the __Amazon MSK__ console, and clicked on __Create customised plugin__ under the __MSK Connect__ section. Here, I entered the __S3 URI__ `s3://<bucket_name>/kafka-connect-s3/confluentinc-kafka-connect-s3-10.0.3.zip`, again changing `<bucket_name>` to the correct one. I then had to name it `<your_UserId>-plugin`, since my account only had permissions to create a plugin called this.
 
-### 2.2 Create a Connector with MSK
+### 3.2 Create a Connector with MSK
 -----------------------------------
 
-Going back to the __Amazon MSK__ console, I clicked on __Connectors__
+Going back to the __Amazon MSK__ console, I clicked on __Connectors__, and then pressed __Create connector__ button. Firstly, I selected the `Use existing customised plugin` option, looked for the __Customised plugin__ I had just created, and then selected it. After hitting next, I was in the __Connector properties__ section. Here (following a similar convention as before) I entered the __Connector name__ as `<your_UserId>-connector`. For the __Apache Kafka cluster__, I chose the __MSK cluster__ option, and selected the appropriate cluster. Now, I had to set up the __Connector configuration__, under the __Configuration settings__ I simply put:
+```
+connector.class=io.confluent.connect.s3.S3SinkConnector
+# same region as our bucket and cluster
+s3.region=us-east-1
+flush.size=1
+schema.compatibility=NONE
+tasks.max=3
+# include nomeclature of topic name, given here as an example will read all data from topic names starting with msk.topic....
+topics.regex=<UserID>.*
+format.class=io.confluent.connect.s3.format.json.JsonFormat
+partitioner.class=io.confluent.connect.storage.partitioner.DefaultPartitioner
+value.converter.schemas.enable=false
+value.converter=org.apache.kafka.connect.json.JsonConverter
+storage.class=io.confluent.connect.s3.storage.S3Storage
+key.converter=org.apache.kafka.connect.storage.StringConverter
+s3.bucket.name=<my_bucket_name>
+```
+
+I left the rest of the options as default, apart from the __Access Permissions__ at the bottom of the page. Here, I found my access role (again by searching for `<UserID>-ec2-access-role`) and chose it. 
+
+I then proceeded to create the __Cluster connector__ after going through all the remaining pages and leaving them as default. I received a message saying my __Connector__ was successfully created.
+
+## 4. Configuring an API in API Gateway
+---------------------------------------
+
+### 4.1 Building a Kafka REST Proxy Integration Method for the API
+------------------------------------------------------------------
+
+### 4.2 Setting Up the Kafka REST Proxy on the EC2 Client
+---------------------------------------------------------
+
+### 4.3 Send Data to the API
+----------------------------
