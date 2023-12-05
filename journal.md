@@ -1,0 +1,45 @@
+# Pinterest Data Pipeline Journal
+
+## 1. Configuring the EC2 Kafka Client
+
+### 1.1 Create a `.pem` Key File Locally
+----------------------------------------
+
+Upon signing into my AWS account, I navigated to the __Parameter Store__. I searched the parameters ussing my `SSH Keypair ID`. Under __Parameter details__, I found the and decrypted the `Value`, revealing an _RSA private key_. I copied and pasted this key into a new `.pem` file, making sure this was created in the correct folder I wanted to connect to the __EC2 instance__ in. However, we need to name this file as `<Key pair assigned at launch>.pem`. To identify the `Key pair assigned at launch`, I went to the __Instances__ section located in the __EC2 Service__. I found the correct instance by referencing my __AWS IAM Username__, and then accessed the __instance summary__. In the __details__ section, I found `Key pair assigned at launch`, which I copy and pasted as the filename.
+
+### 1.2 Connect to the EC2 Instance
+-----------------------------------
+
+I needed to connect to the __EC2 instance__ on an __SSH client__. I am using __WSL__, and I am using the `OpenSSH` client. To install the `OpenSSH` client, I simply wrote the command `sudo apt-get install openssh-client` in a __WSL__ terminal. After confirming I was in the same folder where the `.pem` file is stored, I ran the command `chmod 400 <Key pair assigned at launch>.pem` to make sure the file had been set to the correct permissions. Then I ran `ssh -i "<Key pair assigned at launch>.pem" root@<Public IPv4 DNS>`, which connected me to the __EC2 instance__. 
+
+### 1.3 Set Up Kafka on the EC2 Client
+--------------------------------------
+
+I need to download and install __Kafka__ on my __client EC2 machine__. I have already been proivded with access to an __IAM authenticated MSK cluster__, so I did not have to do this in the project. On the __EC2 client__, I first had to install __Java__, with following command `sudo yum install java-1.8.0`. Since the cluster I was using was running on __Kafka 2.12-2.8.1__, I had to make sure that I dowloaded the correct version of __Kafka__ on my __client EC2 machine__. The command for this is: `wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz`. With the file downloaded, I then used `tar -xzf kafka_2.12-2.8.1.tgz` to extract all the files needed for __Kafka__. 
+
+Following this, I needed to download the __IAM MSK authentication package__ on my __client EC2 machine__. First I navigated to the `libs` folder inside the __Kafka 2.12-2.8.1__ folder (the filepath is `/home/ec2-user/kafka_2.12-2.8.1/libs`). Then, I used the command `wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.5/aws-msk-iam-auth-1.1.5-all.jar`. Before I continued, I navigated to the __Roles__ section in the __IAM console__. It gave me a list of roles, then I had to find the role which was named `<your_UserId>-ec2-access-role`. In this role, I made note of the __ARN__ (_Amazon Resource Name_) in the __Summary__ section. Below the __Summary__ section, I selected the __Trust relationships__ tab, and then hit __Edit trust policy__. Here, I clicked on the __Add a principal__ button and selected __IAM roles__ as the __Principal type__. I had to then paste my __ARN__ in the box below. Upon doing this, I hit the __Add principal__ button, which successfully gave me the __IAM role__, which contains the necessary permissions to authenticate to the __MSK cluster__.
+
+Now, I needed to configure my Kafka client to use AWS IAM authentication on the cluster. To do this, I headed to `/home/ec2-user/kafka_2.12-2.8.1/bin` and edited the `client.properties` file. In here, I added the following:
+
+```
+# Sets up TLS for encryption and SASL for authN.
+security.protocol = SASL_SSL
+
+# Identifies the SASL mechanism to use.
+sasl.mechanism = AWS_MSK_IAM
+
+# Binds SASL client implementation.
+sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="<my ARN>";
+
+# Encapsulates constructing a SigV4 signature based on extracted credentials.
+# The SASL client bound by "sasl.jaas.config" invokes this class.
+sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallbackHandler
+```
+where I replaced `<my ARN>` with the __ARN__ I noted down before.
+
+Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is located at `/home/ec2-user/.bashrc`. When editing, I added the line: `export CLASSPATH=/home/ec2-user/kafka_2.12-2.8.1/libs/aws-msk-iam-auth-1.1.5-all.jar`. Also, while I was here, I made sure to add in `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.382.b05-1.amzn2.0.2.x86_64/jre` too. To make sure the environment variables were set correctly, I wrote the following commands `echo $CLASSPATH` and `echo $JAVA_HOME`
+
+### 1.4 Create Kafka Topics
+---------------------------
+
+Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__
