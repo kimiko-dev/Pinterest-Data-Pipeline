@@ -37,6 +37,12 @@
 
     6.1 [Data Cleaning](#61-data-cleaning)
 
+    - 6.1.1 [Cleaning the Pinterest Post Data](#611-cleaning-the-pinterest-post-data)
+
+    - 6.1.2 [Cleaning the Geolocation Data](#612-cleaning-the-geolocation-data)
+
+    - 6.1.3 [Cleaning the User Data](#613-cleaning-the-user-data)
+
     6.2 [SQL Queries](#62-sql-queries)
 
 
