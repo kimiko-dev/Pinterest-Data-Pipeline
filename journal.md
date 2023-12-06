@@ -241,5 +241,16 @@ I ran the whole code and it returned `True`, meaning it was successfully mounted
 ### 6.1 Data Cleaning
 ---------------------
 
+In the below subsections, I will briefly explain what I cleaned. For a more indepth breakdown, please consult the appropriate __GitHub Wiki__ sections.
+
+#### 6.1.1 Cleaning the Pinterest Post Data
+-------------------------------------------
+
+#### 6.1.2 Cleaning the Geolocation Data
+----------------------------------------
+
+#### 6.1.3 Cleaning the User Data
+---------------------------------
+
 ### 6.2 SQL Queries
 -------------------
