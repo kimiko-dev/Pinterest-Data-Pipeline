@@ -45,6 +45,14 @@
 
     6.2 [SQL Queries](#62-sql-queries)
 
+7. [AWS MWAA](#7-aws-mwaa)
+
+    7.1 [Create and Upload a DAG to a MWAA Environment](#71-create-and-upload-a-dag-to-a-mwaa-environment)
+
+    7.2 [Trigger a DAG that Runs a Databricks Notebook](#72-trigger-a-dag-that-runs-a-databricks-notebook)
+
+8. [AWS Kinesis](#8-aws-kinesis)
+
 
 ## 1. Introduction
 ------------------
