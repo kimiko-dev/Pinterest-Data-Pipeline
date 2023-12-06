@@ -1,6 +1,45 @@
 # Pinterest Data Pipeline Journal
 ---------------------------------
 
+## _Table of Contents_
+
+1. [Introduction](#1-introduction)
+
+2. [Configuring the EC2 Kafka Client](#2-configuring-the-ec2-kafka-client)
+
+    2.1 [Create a `.pem` Key File Locally](#21-create-a-pem-key-file-locally)
+
+    2.2 [Connect to the EC2 Instance](#22-connect-to-the-ec2-instance)
+
+    2.3 [Set Up Kafka on the EC2 Client](#23-set-up-kafka-on-the-ec2-client)
+
+    2.4 [Create Kafka Topics](#24-create-kafka-topics)
+
+3. [Connect a MSK Cluster to a S3 Bucket](#3-connect-a-msk-cluster-to-a-s3-bucket)
+
+    3.1 [Create a Custom Plugin with MSK Connect](#31-create-a-custom-plugin-with-msk-connect)
+
+    3.2 [Create a Connector with MSK](#32-create-a-connector-with-msk)
+    
+4. [Configuring an API in API Gateway](#4-configuring-an-api-in-api-gateway)
+
+    4.1 [Building a Kafka REST Proxy Integration Method for the API](#41-building-a-kafka-rest-proxy-integration-method-for-the-api)
+
+    4.2 [Setting Up the Kafka REST Proxy on the EC2 Client](#42-setting-up-the-kafka-rest-proxy-on-the-ec2-client)
+
+    4.3 [Send Data to the API](#43-send-data-to-the-api)
+
+5. [Setting up Databricks](#5-setting-up-databricks)
+
+    5.1 [Mounting a S3 Bucket to Databricks](#51-mounting-a-s3-bucket-to-databricks)
+    
+6. [Data Cleaning and SQL Queries Using Spark on Databricks](#6-data-cleaning-and-sql-queries-using-spark-on-databricks)
+
+    6.1 [Data Cleaning](#61-data-cleaning)
+
+    6.2 [SQL Queries](#62-sql-queries)
+
+
 ## 1. Introduction
 ------------------
 
@@ -138,7 +177,7 @@ To make sure everything was in working order, I started the __REST proxy__ on th
 ### 4.3 Send Data to the API
 ----------------------------
 
-Here, I edited the `user_posting_emulation.py` which was supplied to us. I added a function which took in data pulled from a source, and the topic name of the topic I needed to send that data too. For the details, please consult the __GitHub Wiki__.
+Here, I edited the `user_posting_emulation.py` file which was supplied to us. I added a function which took in the arguments: data obtained from a source, and the topic name of the topic I needed to send that data to. For the details, please consult the __GitHub Wiki__.
 
 ## 5. Setting up Databricks
 ---------------------------
