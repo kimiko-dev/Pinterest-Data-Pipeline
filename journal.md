@@ -137,3 +137,70 @@ To make sure everything was in working order, I started the __REST proxy__ on th
 
 ### 4.3 Send Data to the API
 ----------------------------
+
+Here, I edited the `user_posting_emulation.py` which was supplied to us. I added a function which took in data pulled from a source, and the topic name of the topic I needed to send that data too. For the details, please consult the __GitHub Wiki__.
+
+## 5. Setting up Databricks
+---------------------------
+
+Before I was able to clean the data, I needed to read the data from my __S3 bucket__ into __Databricks__. This can be done by mounting the desired __S3 bucket__ to __Databricks__.
+
+### 5.1 Mounting a S3 Bucket to Databricks
+------------------------------------------
+
+My `authentication_credentials.csv` file (which contains the __AWS access key__ and __secret access key__) had already been uploaded to __Databricks__, so I can start mounting the __S3 bucket__ right away. 
+
+To write the code for this, I simply created a new __Notebook__. First I needed import the correct libraries and read the `authentication_credentials.csv` file, the code looked like:
+
+```
+from pyspark.sql.functions import *
+import urllib
+
+
+# Specify file type to be csv
+file_type = "csv"
+# Indicates file has first row as the header
+first_row_is_header = "true"
+# Indicates file has comma as the delimeter
+delimiter = ","
+# Read the CSV file to spark dataframe
+aws_keys_df = spark.read.format(file_type)\
+.option("header", first_row_is_header)\
+.option("sep", delimiter)\
+.load("/FileStore/tables/authentication_credentials.csv")
+```
+
+Then, I extracted the __AWS access key__ and __secret access key__ from the __Spark DataFrame__ I created above. Additionally, I made sure to __encode__ the __secret access key__ for security reasons. The code for this is:
+
+```
+# Get the AWS access key and secret key from the spark dataframe
+ACCESS_KEY = aws_keys_df.where(col('User name')=='databricks-user').select('Access key ID').collect()[0]['Access key ID']
+SECRET_KEY = aws_keys_df.where(col('User name')=='databricks-user').select('Secret access key').collect()[0]['Secret access key']
+# Encode the secret key
+ENCODED_SECRET_KEY = urllib.parse.quote(string=SECRET_KEY, safe="")
+```
+
+Now, I was able to mount the __S3 bucket__ by passing in the __S3 URL__ and the __desired mount name__ into the code below:
+
+```
+# AWS S3 bucket name
+AWS_S3_BUCKET = "<S3_URL>"
+# Mount name for the bucket
+MOUNT_NAME = "/mnt/<desired_mount_name>"
+# Source url
+SOURCE_URL = "s3n://{0}:{1}@{2}".format(ACCESS_KEY, ENCODED_SECRET_KEY, AWS_S3_BUCKET)
+# Mount the drive
+dbutils.fs.mount(SOURCE_URL, MOUNT_NAME)
+```
+Since I have three __Kafka Topics__ which correspond to three different paths in the __S3 bucket__, I made sure to have three copies of the code above using appropriate values for `<S3_URL>` and `<desired_mount_name>`.
+
+I ran the whole code and it returned `True`, meaning it was successfully mounted.
+
+## 6. Data Cleaning and SQL Queries Using Spark on Databricks
+-------------------------------------------------------------
+
+### 6.1 Data Cleaning
+---------------------
+
+### 6.2 SQL Queries
+-------------------
