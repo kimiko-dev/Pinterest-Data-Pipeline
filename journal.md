@@ -244,6 +244,8 @@ I ran the whole code and it returned `True`, meaning it was successfully mounted
 ## 6. Data Cleaning and SQL Queries Using Spark on Databricks
 -------------------------------------------------------------
 
+(made a new notebook here, need this for later)
+
 ### 6.1 Data Cleaning
 ---------------------
 
@@ -321,3 +323,16 @@ I used the __pyspark.sql__ module on __Python__ to create the queries. I wrote q
 - Find how many users have joined between 2015 and 2020.
 - Find the median follower count of users have joined between 2015 and 2020.
 - Find the median follower count of users that have joined between 2015 and 2020, based on which age group they are part of.
+
+## 7. AWS MWAA
+--------------
+
+### 7.1 Create and Upload a DAG to a MWAA Environment
+-----------------------------------------------------
+
+### 7.2 Trigger a DAG that Runs a Databricks Notebook
+-----------------------------------------------------
+
+## 8 AWS Kinesis
+----------------
+
