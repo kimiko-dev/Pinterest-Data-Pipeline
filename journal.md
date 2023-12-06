@@ -267,7 +267,7 @@ In the below subsections, I will explain how I cleaned each dataframe.
 
 Here, there were rows of post data which were labled as `multi-video(story page format)` and a lot of its columns had 'empty' entries, such as:
 
-| Column Label | Entry |
+| Column | Entry |
 | :----: | :----: |
 | `description` | `No description available Story format` |
 | `follower_count` | `User Info Error` |
@@ -284,10 +284,12 @@ I then renamed the `index` column to `ind` so that it was consistent across all 
 
 Following this, entires in the `save_location` column all had `Local save in` infront of the save location path. This information is redundant so I simply removed the `Local save in` from all entries. For example, `Local save in /data/home-decor` would be transformed to just `/data/home-decor`.
 
-Lastly, I reordered the columns into an order which I was asked to do.
+Lastly, I reordered the columns into an order which was asked for.
 
 #### 6.1.2 Cleaning the Geolocation Data
 ----------------------------------------
+
+
 
 #### 6.1.3 Cleaning the User Data
 ---------------------------------
