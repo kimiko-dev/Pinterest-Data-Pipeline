@@ -34,13 +34,13 @@ security.protocol = SASL_SSL
 sasl.mechanism = AWS_MSK_IAM
 
 # Binds SASL client implementation.
-sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="<my ARN>";
+sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="<my_ARN>";
 
 # Encapsulates constructing a SigV4 signature based on extracted credentials.
 # The SASL client bound by "sasl.jaas.config" invokes this class.
 sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallbackHandler
 ```
-where I replaced `<my ARN>` with the __ARN__ I noted down before.
+where I replaced `<my_ARN>` with the __ARN__ I noted down before.
 
 Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is located at `/home/ec2-user/.bashrc`. When editing, I added the line: `export CLASSPATH=/home/ec2-user/kafka_2.12-2.8.1/libs/aws-msk-iam-auth-1.1.5-all.jar`. Also, while I was here, I made sure to add in `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.382.b05-1.amzn2.0.2.x86_64/jre` too. To make sure the environment variables were set correctly, I wrote the following commands `echo $CLASSPATH` and `echo $JAVA_HOME`
 
@@ -64,7 +64,7 @@ To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8
 
 Firstly, I need to go to the __S3 console__ and find the correct bucket. It is named `user-<my_UserId>-bucket`, and I made a note of the name.
 
-Now, on my __EC2 client__, I downloaded the __Confluent.io Amazon S3 Connector__. To do this, I simply used to command `wget https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.0.3/confluentinc-kafka-connect-s3-10.0.3.zip`. Next, I need to move it to the correct __S3 bucket__. This was easy to do, I simply entered the command `aws s3 cp ./confluentinc-kafka-connect-s3-10.0.3.zip s3://<bucket_name>/kafka-connect-s3/`, where I replaced `<bucket_name>` with the one I obtained earlier.
+Now, on my __EC2 client__, I downloaded the __Confluent.io Amazon S3 Connector__. To do this, I simply used to command `sudo wget https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.0.3/confluentinc-kafka-connect-s3-10.0.3.zip`. Next, I need to move it to the correct __S3 bucket__. This was easy to do, I simply entered the command `aws s3 cp ./confluentinc-kafka-connect-s3-10.0.3.zip s3://<bucket_name>/kafka-connect-s3/`, where I replaced `<bucket_name>` with the one I obtained earlier.
 
 I then navigated to the __Amazon MSK__ console, and clicked on __Create customised plugin__ under the __MSK Connect__ section. Here, I entered the __S3 URI__ `s3://<bucket_name>/kafka-connect-s3/confluentinc-kafka-connect-s3-10.0.3.zip`, again changing `<bucket_name>` to the correct one. I then had to name it `<your_UserId>-plugin`, since my account only had permissions to create a plugin called this.
 
@@ -97,11 +97,43 @@ I then proceeded to create the __Cluster connector__ after going through all the
 ## 4. Configuring an API in API Gateway
 ---------------------------------------
 
+For this project, I did not need to create my own __API__ since one had already been made for me. However, I still needed to configure it. 
+
 ### 4.1 Building a Kafka REST Proxy Integration Method for the API
 ------------------------------------------------------------------
 
+First of all, I navigated to the __EC2 instances__ and found my __client EC2 machine__ and selected it. In the __Details__ section, I found the __Public IPv4 DNS__ and made note of it for later use.
+
+On the __API Gateway__, I searched for the __API__ which had been setup for me. Upon finding it, I clicked on it which took me to the __Resources__ page. Here, I clicked on the __Create resource__ button, which took me to a set up screen. Now, I made sure to turn on __Proxy resource__, I set the __Resource path__ as `/{proxy+}` and set the __Resource name__ as `{proxy+}`. Lastly, I selected the __CORS (Cross Origin Resource Sharing)__ box and then hit __Create resource__.
+
+When clicking on the new resource I had just created, I pressed the __Create method__ button as I wanted to create a __HTTP ANY method__. For the __Method type__ I selected __ANY__ in the dropdown box. For __Integration type__, I selected __HTTP Proxy__. Finally, for the __Endpoint URL__, I wrote the following `http://<Public IPv4 DNS>:8082/{proxy}`. I then clicked __Create Method__, which successfully created the method. 
+
+Now, I needed to get __Invoke URL__. To do this, I simply pressed the __Deploy API__ button, created a new __Stage__ called `dev` and then deployed the API. It took me to the __Stages__ page on the __API Gateway__ where it gave me the __Invoke URL__, and I noted this down. 
+
 ### 4.2 Setting Up the Kafka REST Proxy on the EC2 Client
 ---------------------------------------------------------
+
+On the __client EC2 machine__ I had to install __Confluent package__ for the __Kafka REST Proxy__. To do this, I ran the following commands: `sudo wget https://packages.confluent.io/archive/7.2/confluent-7.2.0.tar.gz` (which downloads the __Confluent package__) and then `tar -xvzf confluent-7.2.0.tar.gz ` (which extracts and decompresses the contents of `confluent-7.2.0.tar.gz`)
+
+Next, on the __client EC2 machine__ I navigated to `/home/ec2-user/confluent-7.2.0/etc/kafka-rest` where I modified the `kafka-rest.properties` file, where I changed the `bootstrap.servers` and the `zookeeper.connect` variables in this file, with the corresponding **Boostrap server string** and **Plaintext Apache Zookeeper connection string** (these are the ones from [2.4](#24-create-kafka-topics)). On top of this, I had to surpass the __IAM authentecation__ of the __MSK cluster__, so similar to [before](#23-set-up-kafka-on-the-ec2-client) (and making use of the __IAM MSK authentication package__), I added the following to the `kafka-rest.properties` file:
+
+```
+# Sets up TLS for encryption and SASL for authN.
+client.security.protocol = SASL_SSL
+
+# Identifies the SASL mechanism to use.
+client.sasl.mechanism = AWS_MSK_IAM
+
+# Binds SASL client implementation.
+client.sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="<my_ARN>";
+
+# Encapsulates constructing a SigV4 signature based on extracted credentials.
+# The SASL client bound by "sasl.jaas.config" invokes this class.
+client.sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallbackHandler
+```
+Again replacing `<my_ARN>` with the one I obtained from [2.3](#23-set-up-kafka-on-the-ec2-client).
+
+To make sure everything was in working order, I started the __REST proxy__ on the __client EC2 machine__. To do this, I first navigated to `/home/ec2-user/confluent-7.2.0/bin` and then ran the command `./kafka-rest-start /home/ec2-user/confluent-7.2.0/etc/kafka-rest/kafka-rest.properties`. Everything ran correctly as I was given the message _INFO Server started, listening for requests..._ on the __client EC2 machine__.
 
 ### 4.3 Send Data to the API
 ----------------------------
