@@ -311,7 +311,7 @@ Lastly, I reordered the columns into an order which required.
 ### 6.2 SQL Queries
 -------------------
 
-I used __pyspark.sql__ module on __Python__ to create the queries. I wrote queries based on the following questions:
+I used the __pyspark.sql__ module on __Python__ to create the queries. I wrote queries based on the following questions:
 
 - Find the most popular category in each country.
 - Find how many posts each category had between 2018 and 2022.
