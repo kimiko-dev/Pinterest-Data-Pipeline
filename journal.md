@@ -284,15 +284,40 @@ I then renamed the `index` column to `ind` so that it was consistent across all 
 
 Following this, entires in the `save_location` column all had `Local save in` infront of the save location path. This information is redundant so I simply removed the `Local save in` from all entries. For example, `Local save in /data/home-decor` would be transformed to just `/data/home-decor`.
 
-Lastly, I reordered the columns into an order which was asked for.
+Lastly, I reordered the columns into an order which required.
 
 #### 6.1.2 Cleaning the Geolocation Data
 ----------------------------------------
 
+No data here needed to be scrubbed clean like before. 
 
+The first thing I did was create a new column called `coordinates`. In this column, I made an array using values from the `latitude` and `longitude` columns. The array looked like this `['latitude', 'longitude']`. After this new column is created, I dropped the `latitude` and `longitude` columns since they have become redundant. 
+
+Then, I converted the `timestamp` column into the correct `timestamp` datatype, I also made sure that the formatting was in the correct form of `yyyy-MM-dd HH:mm:ss`.
+
+Lastly, I reordered the columns into an order which required.
 
 #### 6.1.3 Cleaning the User Data
 ---------------------------------
 
+No data here needed to be scrubbed clean.
+
+Firstly, I created a new column called `user_name`. In this column, I made a new string using values from the `first_name` and `last_name` columns. The new string looked like this looked like this `'first_name' 'last_name'`. After this new column is created, I dropped the `first_name` and `last_name` columns since they have become redundant.
+
+Then, I converted the `date_joined` column into the correct `timestamp` datatype, I also made sure that the formatting was in the correct form of `yyyy-MM-dd HH:mm:ss`.
+
+Lastly, I reordered the columns into an order which required.
+
 ### 6.2 SQL Queries
 -------------------
+
+I used __pyspark.sql__ module on __Python__ to create the queries. I wrote queries based on the following questions:
+
+- Find the most popular category in each country.
+- Find how many posts each category had between 2018 and 2022.
+- Find the user with the most followers in each country.
+- Find which was the most popular for different age groups.
+- Find the median follower count for different age groups.
+- Find how many users have joined between 2015 and 2020.
+- Find the median follower count of users have joined between 2015 and 2020.
+- Find the median follower count of users that have joined between 2015 and 2020, based on which age group they are part of.
