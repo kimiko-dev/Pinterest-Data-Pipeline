@@ -247,10 +247,44 @@ I ran the whole code and it returned `True`, meaning it was successfully mounted
 ### 6.1 Data Cleaning
 ---------------------
 
-In the below subsections, I will briefly explain what I cleaned. For a more indepth breakdown, please consult the appropriate __GitHub Wiki__ sections.
+First, I had to read the data from the __mounted S3 bucket__. I had to read this data three times since I had three __S3 URL__\s where the seperate data was stored. The code for this was:
+
+```
+# File location and type
+file_location = "/mnt/<mount_name>/*.json" 
+file_type = "json"
+# Ask Spark to infer the schema
+infer_schema = "true"
+# Read in JSONs from mounted S3 bucket
+<appropriate_df_name> = spark.read.format(file_type) \
+.option("inferSchema", infer_schema) \
+.load(file_location)
+```
+In the below subsections, I will explain how I cleaned each dataframe.
 
 #### 6.1.1 Cleaning the Pinterest Post Data
 -------------------------------------------
+
+Here, there were rows of post data which were labled as `multi-video(story page format)` and a lot of its columns had 'empty' entries, such as:
+
+| Column Label | Entry |
+| :----: | :----: |
+| `description` | `No description available Story format` |
+| `follower_count` | `User Info Error` |
+| `image_src` | `Image src error.` |
+| `poster_name` | `User Info Error` |
+| `tag_list` | `N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e` |
+| `title` | `No Title Data Available` |
+
+I made sure to scrub these entries clean, by replacing them with `None`.
+
+Next, I had to turn the `follower_count` column into __Integer__ data type. This wasn't so straight forward as `follower_count`\'s over `100,000` either had a `k` or `M` suffix attached to the end. If it had a suffix of `'k'`, I replaced it with `'000'` (since it was still a string). For example, `'400k'` would turn into `'400000'`. Similarly, if it had a suffix of `'M'`, it would be replaced with `'000000'`. For example, `'2M'` would be transformed to `'2000000`. I then cast the `follower_count` column into the correct __Integer__ data type. 
+
+I then renamed the `index` column to `ind` so that it was consistent across all three dataframes.
+
+Following this, entires in the `save_location` column all had `Local save in` infront of the save location path. This information is redundant so I simply removed the `Local save in` from all entries. For example, `Local save in /data/home-decor` would be transformed to just `/data/home-decor`.
+
+Lastly, I reordered the columns into an order which I was asked to do.
 
 #### 6.1.2 Cleaning the Geolocation Data
 ----------------------------------------
