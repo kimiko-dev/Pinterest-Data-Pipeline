@@ -67,6 +67,14 @@
 
     - 8.2.5 [Add Records to Streams](#825-add-records-to-streams)
 
+    8.3 [Send Data to the Kinesis Stream](#83-send-data-to-the-kinesis-stream)
+
+    8.4 [Read Data from the Kinesis Streams in Databricks](#84-read-data-from-the-kinesis-streams-in-databricks)
+
+    8.5 [Transform Kinesis streams in Databricks](#85-transform-kinesis-streams-in-databricks)
+
+    8.6 [Write the Streaming Data to Delta Tables](#86-write-the-streaming-data-to-delta-tables)
+
 
 ## 1. Introduction
 ------------------
