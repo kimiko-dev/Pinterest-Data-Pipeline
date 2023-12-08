@@ -299,8 +299,6 @@ Lastly, I reordered the columns into an order which required.
 #### 6.1.2 Cleaning the Geolocation Data
 ----------------------------------------
 
-No data here needed to be scrubbed clean like before. 
-
 The first thing I did was create a new column called `coordinates`. In this column, I made an array using values from the `latitude` and `longitude` columns. The array looked like this `['latitude', 'longitude']`. After this new column is created, I dropped the `latitude` and `longitude` columns since they have become redundant. 
 
 Then, I converted the `timestamp` column into the correct `timestamp` datatype, I also made sure that the formatting was in the correct form of `yyyy-MM-dd HH:mm:ss`.
@@ -309,8 +307,6 @@ Lastly, I reordered the columns into an order which required.
 
 #### 6.1.3 Cleaning the User Data
 ---------------------------------
-
-No data here needed to be scrubbed clean.
 
 Firstly, I created a new column called `user_name`. In this column, I made a new string using values from the `first_name` and `last_name` columns. The new string looked like this looked like this `'first_name' 'last_name'`. After this new column is created, I dropped the `first_name` and `last_name` columns since they have become redundant.
 
@@ -335,12 +331,86 @@ I used the __pyspark.sql__ module on __Python__ to create the queries. I wrote q
 ## 7. AWS MWAA
 --------------
 
+In this section, I did not need to create a __S3 Bucket__ for __MWAA__, and I also did not need to create a __MWAA environment__ since these had already been made for me. 
+
 ### 7.1 Create and Upload a DAG to a MWAA Environment
 -----------------------------------------------------
+
+To create the __DAG__, I made a new python script, which was labled `<IAM_Username>-dag.py` (the file had to be called this since I only had permission to upload a file titled this). In this file, I simply wrote the following code:
+
+```
+#Define params for Submit Run Operator
+notebook_task = {
+    'notebook_path': '<path-to-databricks-notebook>',
+}
+
+default_args = {
+    'owner': '<name>',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 2,
+    'retry_delay': timedelta(minutes=2)
+}
+
+#Creating the DAG.
+with DAG('<IAM_Username>-dag',
+    start_date=datetime.now(),
+    schedule_interval='@daily',
+    catchup=False,
+    default_args=default_args
+    ) as dag:
+
+
+    opr_submit_run = DatabricksSubmitRunOperator(
+        task_id='submit_run',
+        databricks_conn_id='databricks_default',
+        existing_cluster_id='<cluster_id>',
+        notebook_task=notebook_task
+    )
+    opr_submit_run
+```
+I was instructed to make the __DAG__ trigger once a day, indicated by the line `schedule_interval='@daily'` when creating the __DAG__. 
+
+To obtain the `<cluster_id>`, I made sure I was in a notebook which was in the same path as `<path-to-databricks-notebook>` and ran the line:
+
+```
+spark.conf.get("spark.databricks.clusterUsageTags.clusterId")
+```
+
+After making sure the setup was correct, I uploaded the `<IAM_Username>-dag.py` file to the appropriate __S3 bucket__ file path, with that being `mwaa-dags-bucket/dags`. 
 
 ### 7.2 Trigger a DAG that Runs a Databricks Notebook
 -----------------------------------------------------
 
+First, I navigated to the __MWAA console__, and in the __Environments__ section, I found the correct environment `Databricks-Airflow-env`, and then clicked on __Open Airflow UI__, which took me to the __Airflow UI__. I was presented with a list of __DAG__\s, where I found I found the __DAG__ I had just created. After I clicked on my __DAG__, I unpaused my it and it started to get to work. After 6 minutes, the __DAG__ was finished and I was greeted with a _dark green_ box in the __Tree__ section of my __DAG__ indicating that it had been successfully ran! 
+
 ## 8 AWS Kinesis
 ----------------
 
+### 8.1 Create Data Streams Using Kinesis Data Streams
+------------------------------------------------------
+
+ I had to create three __Data streams__ which correspond to each table. So I navigated to the __Kinesis console__, and in the __Data streams__ section, I pressed on the __Create data streams__ button. This took me to a page for the __Data stream configuration__. For the __Data stream name__, I called the three seperate streams `streaming-<IAM_username>-pin`,`streaming-<IAM_username>-pin` and `streaming-<IAM_username>-pin` (these streams had to be called this as I only had permission to create __data streams__ named this way). And for all three, I made sure that the __Capacity mode__ which was selected was infact __On-demand__.
+
+### 8.2 Configure an API with Kinesis Proxy Integration
+-------------------------------------------------------
+
+First of all, I need to go to the __IAM dashboard__ and then go onto the __Roles__ section. I filtered the results using my __IAM Username__ and found the __Kinesis access role__, which was named as `<IAM_username>-kinesis-access-role`. I clicked on it, and noted down my __ARN__ which was in the summary section.
+
+Next, I went to the __API gateway__ and found the __API__ I was using [here](#41-building-a-kafka-rest-proxy-integration-method-for-the-api). I needed to make the __API__ invoke the following actions: List, create, describe, delete and add records to streams in Kinesis. I will talk about how I did all of these below
+
+#### 8.2.1 List Streams
+----------------------
+
+#### 8.2.2 Create Streams
+-------------------------
+
+#### 8.2.3 Describe Streams
+---------------------------
+
+#### 8.2.4 Delete Streams
+-------------------------
+
+#### 8.2.5 Add Records to Streams
+---------------------------------
