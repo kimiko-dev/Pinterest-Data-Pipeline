@@ -53,6 +53,20 @@
 
 8. [AWS Kinesis](#8-aws-kinesis)
 
+    8.1 [Create Data Streams Using Kinesis Data Streams](#81-create-data-streams-using-kinesis-data-streams)
+
+    8.2 [Configure an API with Kinesis Proxy Integration](#82-configure-an-api-with-kinesis-proxy-integration)
+
+    - 8.2.1 [List Streams](#821-list-streams)
+
+    - 8.2.2 [Create Streams](#822-create-streams)
+
+    - 8.2.3 [Describe Streams](#823-describe-streams)
+
+    - 8.2.4 [Delete Streams](#824-delete-streams)
+
+    - 8.2.5 [Add Records to Streams](#825-add-records-to-streams)
+
 
 ## 1. Introduction
 ------------------
@@ -414,3 +428,15 @@ Next, I went to the __API gateway__ and found the __API__ I was using [here](#41
 
 #### 8.2.5 Add Records to Streams
 ---------------------------------
+
+### 8.3 Send Data to the Kinesis Stream
+---------------------------------------
+
+### 8.4 Read Data from the Kinesis Streams in Databricks
+--------------------------------------------------------
+
+### 8.5 Transform Kinesis streams in Databricks
+-----------------------------------------------
+
+### 8.6 Write the Streaming Data to Delta Tables
+------------------------------------------------
