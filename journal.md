@@ -420,22 +420,124 @@ First, I navigated to the __MWAA console__, and in the __Environments__ section,
 
 First of all, I need to go to the __IAM dashboard__ and then go onto the __Roles__ section. I filtered the results using my __IAM Username__ and found the __Kinesis access role__, which was named as `<IAM_username>-kinesis-access-role`. I clicked on it, and noted down my __ARN__ which was in the summary section.
 
-Next, I went to the __API gateway__ and found the __API__ I was using [here](#41-building-a-kafka-rest-proxy-integration-method-for-the-api). I needed to make the __API__ invoke the following actions: List, create, describe, delete and add records to streams in Kinesis. I will talk about how I did all of these below
+Next, I went to the __API gateway__ and found the __API__ I was using [here](#41-building-a-kafka-rest-proxy-integration-method-for-the-api). I needed to make the __API__ invoke the following actions: List, create, describe, delete and add records to streams in Kinesis. I will talk about how I did all of these below.
 
 #### 8.2.1 List Streams
 ----------------------
 
+In the __Actions__ tab of the __API__, I clicked on __Create Resource__. For the __Resource Name__ I typed `streams`. I made sure that the __Resource Path__ was correct, it needed to be `/streams` and it was. I left the rest of the options as defualt and pressed __Create Reasource__.
+
+Remaining on the __Resource__ page of the __API__, I selected `/streams`, making sure it showed a section called __/stream Methods__. I then pressed the __Actions__ tab again and clicked on __Create Method__. Here, I selected __`GET`__ from the drop-down list and pressed the tick next to it. I was then greeted by a __Setup__ panel and I configured the following settings:
+
+- __Integration type__ as __AWS Service__
+- __AWS Region__ as __`us-east-1`__
+- __AWS Service__ as __Kinesis__
+- __HTTP method__ as __`POST`__
+- __Action Type__ as __User action name__
+- __Action__ as __`ListStreams`__
+- __Execution role__ as the __ARN__ I mentioned [here](#82-configure-an-api-with-kinesis-proxy-integration)
+
+I pressed __Save__ and it took me to a page which showed the __Method Execution__. I pressed on the __Integration Request__ and then I scrolled down to find a section called __HTTP Headers__. Here, I selected __Add header__, entered the __Name__ as
+__`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'`__. I the pressed the tick button which created the __HTTP header__. Next, I expanded the __Mapping Templates__ panel below the __HTTP Headers__ and I did the following: Selected __Add mapping template__, for __Content-Type__ I wrote `application/json` and then pressed the tick button. I scrolled down a bit to find the __template editior__, where I simply typed `{}`. I made sure to click the __Save__ button to save the __Mapping Template__
+
 #### 8.2.2 Create Streams
 -------------------------
+
+First of all, we will need to create a new __child resource__ under the __`streams` resource__. For this __resource__, the __Resource Name__ is `stream-name` and the full __Resource Path__ is `/streams/{stream-name}`. 
+
+After creating this, I simply clicked on `/{stream-name}` so that it was highlighted. Then, I pressed the __Actions__ box, selected __Create Method__. In the dropdown box that appeared, I selected __`POST`__ and pressed the tick. This took me to the __Setup__ panel, where I chose the following options:
+
+- __Integration type__ as __AWS Service__
+- __AWS Region__ as __`us-east-1`__
+- __AWS Service__ as __Kinesis__
+- __HTTP method__ as __`POST`__
+- __Action Type__ as __User action name__
+- __Action__ as __`CreateStream`__
+- __Execution role__ as the __ARN__ I mentioned [here](#82-configure-an-api-with-kinesis-proxy-integration)
+
+I pressed __Save__ and it took me to a page which showed the __Method Execution__. I pressed on the __Integration Request__ and then I scrolled down to find a section called __HTTP Headers__. Here, I selected __Add header__, entered the __Name__ as
+__`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'`__. I the pressed the tick button which created the __HTTP header__. Next, I expanded the __Mapping Templates__ panel below the __HTTP Headers__ and I did the following: Selected __Add mapping template__, for __Content-Type__ I wrote `application/json` and then pressed the tick button. I scrolled down a bit to find the __template editior__, where I simply typed:
+
+```
+{
+    "ShardCount": #if($input.path('$.ShardCount') == '') 5 #else $input.path('$.ShardCount') #end,
+    "StreamName": "$input.params('stream-name')"
+}
+```
+I finally clicked the __Save__ button to save the __Mapping Template__.
 
 #### 8.2.3 Describe Streams
 ---------------------------
 
+First of all, I simply clicked on `/{stream-name}` (from [before](#822-create-streams)) so that it was highlighted. Then, I pressed the __Actions__ box, selected __Create Method__. In the dropdown box that appeared, I selected __`GET`__ and pressed the tick. This took me to the __Setup__ panel, where I chose the following options:
+
+- __Integration type__ as __AWS Service__
+- __AWS Region__ as __`us-east-1`__
+- __AWS Service__ as __Kinesis__
+- __HTTP method__ as __`POST`__
+- __Action Type__ as __User action name__
+- __Action__ as __`DescribeStream`__
+- __Execution role__ as the __ARN__ I mentioned [here](#82-configure-an-api-with-kinesis-proxy-integration)
+
+I pressed __Save__ and it took me to a page which showed the __Method Execution__. I pressed on the __Integration Request__ and then I scrolled down to find a section called __HTTP Headers__. Here, I selected __Add header__, entered the __Name__ as
+__`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'`__. I the pressed the tick button which created the __HTTP header__. Next, I expanded the __Mapping Templates__ panel below the __HTTP Headers__ and I did the following: Selected __Add mapping template__, for __Content-Type__ I wrote `application/json` and then pressed the tick button. I scrolled down a bit to find the __template editior__, where I simply typed:
+
+```
+{
+    "StreamName": "$input.params('stream-name')"
+}
+```
+I finally clicked the __Save__ button to save the __Mapping Template__.
+
 #### 8.2.4 Delete Streams
 -------------------------
 
+First of all, I simply clicked on `/{stream-name}` (from [before](#822-create-streams)) so that it was highlighted. Then, I pressed the __Actions__ box, selected __Create Method__. In the dropdown box that appeared, I selected __`DELETE`__ and pressed the tick. This took me to the __Setup__ panel, where I chose the following options:
+
+- __Integration type__ as __AWS Service__
+- __AWS Region__ as __`us-east-1`__
+- __AWS Service__ as __Kinesis__
+- __HTTP method__ as __`POST`__
+- __Action Type__ as __User action name__
+- __Action__ as __`DeleteStream`__
+- __Execution role__ as the __ARN__ I mentioned [here](#82-configure-an-api-with-kinesis-proxy-integration)
+
+I pressed __Save__ and it took me to a page which showed the __Method Execution__. I pressed on the __Integration Request__ and then I scrolled down to find a section called __HTTP Headers__. Here, I selected __Add header__, entered the __Name__ as
+__`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'`__. I the pressed the tick button which created the __HTTP header__. Next, I expanded the __Mapping Templates__ panel below the __HTTP Headers__ and I did the following: Selected __Add mapping template__, for __Content-Type__ I wrote `application/json` and then pressed the tick button. I scrolled down a bit to find the __template editior__, where I simply typed:
+
+```
+{
+    "StreamName": "$input.params('stream-name')"
+}
+```
+I finally clicked the __Save__ button to save the __Mapping Template__.
+
 #### 8.2.5 Add Records to Streams
 ---------------------------------
+
+Going back to my __API Resources__ page, I clicked on `/{stream-name}`, and then pressed the __Action__ button and selected __Create Resource__. I set up a child resource, where the __Resource Name__ was __`record`__ and the full __Resource Path__ is `/streams/{stream-name}/record`, I then hit save. Which took me back to the __API Resources__ page.
+
+After clicking on `/record`, I clicked the __Actions__ box and selected __Create Method__. In the drop down box, I made sure to choose __`PUT`__ and then clicked on the tick button. This took me to the __Setup__ panel, where I chose the following options:
+
+- __Integration type__ as __AWS Service__
+- __AWS Region__ as __`us-east-1`__
+- __AWS Service__ as __Kinesis__
+- __HTTP method__ as __`POST`__
+- __Action Type__ as __User action name__
+- __Action__ as __`PutRecord`__
+- __Execution role__ as the __ARN__ I mentioned [here](#82-configure-an-api-with-kinesis-proxy-integration)
+
+I pressed __Save__ and it took me to a page which showed the __Method Execution__. I pressed on the __Integration Request__ and then I scrolled down to find a section called __HTTP Headers__. Here, I selected __Add header__, entered the __Name__ as
+__`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'`__. I the pressed the tick button which created the __HTTP header__. Next, I expanded the __Mapping Templates__ panel below the __HTTP Headers__ and I did the following: Selected __Add mapping template__, for __Content-Type__ I wrote `application/json` and then pressed the tick button. I scrolled down a bit to find the __template editior__, where I simply typed:
+
+```
+{
+    "StreamName": "$input.params('stream-name')",
+    "Data": "$util.base64Encode($input.json('$.Data'))",
+    "PartitionKey": "$input.path('$.PartitionKey')"
+}
+```
+I finally clicked the __Save__ button to save the __Mapping Template__.
 
 ### 8.3 Send Data to the Kinesis Stream
 ---------------------------------------
