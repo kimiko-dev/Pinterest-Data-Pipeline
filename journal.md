@@ -213,7 +213,7 @@ To make sure everything was in working order, I started the __REST proxy__ on th
 ### 4.3 Send Data to the API
 ----------------------------
 
-Here, I edited the `user_posting_emulation.py` file which was supplied to us. I added a function which took in the arguments: data obtained from a source, and the topic name of the topic I needed to send that data to. For the details, please consult the __GitHub Wiki__.
+Here, I edited the `user_posting_emulation.py` file which was supplied to us. I added a function which took in the arguments: data obtained from a source, and the topic name of the topic I needed to send that data to.
 
 ## 5. Setting up Databricks
 ---------------------------
@@ -541,6 +541,8 @@ I finally clicked the __Save__ button to save the __Mapping Template__.
 
 ### 8.3 Send Data to the Kinesis Stream
 ---------------------------------------
+
+Here, I edited the `user_posting_emulation.py` file last seen [here](#43-send-data-to-the-api). I added a function which took in the arguments: data obtained from a source, and the stream name of the stream I needed to send that data to. When running this file, I received a status code of __`200`__ which signified the data had been sent to the __Kinesis Stream__ correctly. 
 
 ### 8.4 Read Data from the Kinesis Streams in Databricks
 --------------------------------------------------------
