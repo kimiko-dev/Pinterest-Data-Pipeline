@@ -279,16 +279,13 @@ I ran the whole code and it returned `True`, meaning it was successfully mounted
 ### 6.1 Data Cleaning
 ---------------------
 
-First, I had to read the data from the __mounted S3 bucket__. I had to read this data three times since I had three __S3 URL__\s where the seperate data was stored. The code for this was:
+First, I had to read the data from the __mounted S3 bucket__. I had to read this data three times since I had three __S3 URL__\s where the seperate data was stored. So I decided to make a function. The code inside the function was:
 
 ```
-# File location and type
 file_location = "/mnt/<mount_name>/*.json" 
 file_type = "json"
-# Ask Spark to infer the schema
 infer_schema = "true"
-# Read in JSONs from mounted S3 bucket
-<appropriate_df_name> = spark.read.format(file_type) \
+df = spark.read.format(file_type) \
 .option("inferSchema", infer_schema) \
 .load(file_location)
 ```
@@ -539,6 +536,8 @@ __`Content-Type`__ and for __Mapped from__ I put __`'application/x-amz-json-1.1'
 ```
 I finally clicked the __Save__ button to save the __Mapping Template__.
 
+After creating all the new __Methods__ and __Resources__, I had to redeploy the __API__.
+
 ### 8.3 Send Data to the Kinesis Stream
 ---------------------------------------
 
@@ -547,8 +546,17 @@ Here, I edited the `user_posting_emulation.py` file last seen [here](#43-send-da
 ### 8.4 Read Data from the Kinesis Streams in Databricks
 --------------------------------------------------------
 
+After creating a new __Notebook__ in __Databricks__\, I read the file `authentication_credentials.csv`, and retrieved the __`Access Key`__ and the __`Secret Access Key`__. This is exactly the same as [before](#51-mounting-a-s3-bucket-to-databricks), so I will spare you the details here. I made a function which reads the __Kinesis Stream__ data and transforms it into a usable dataframe ready for further transformation. To see the function, please see this [notebook]().
+
 ### 8.5 Transform Kinesis streams in Databricks
 -----------------------------------------------
+
+Here, I performed transformations to each data set in the same way as I did [here](#61-data-cleaning).
+
+For the each specific set of data see:
+- [Cleaning the Pinterest Post Data](#611-cleaning-the-pinterest-post-data)
+- [Cleaning the Geolocation Data](#612-cleaning-the-geolocation-data)
+- [Cleaning the User Data](#613-cleaning-the-user-data)
 
 ### 8.6 Write the Streaming Data to Delta Tables
 ------------------------------------------------
