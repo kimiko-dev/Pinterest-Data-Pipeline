@@ -30,6 +30,8 @@
 
 - __`json`__: Used to serialise Python dictionaries into a __JSON-formatted string__, to be sent to the __RESTful API__.
 
+- __`pyspark`__: Used in __Databricks notebooks__, leveraging the native support for Spark.
+
 - __`random`__: Used to introduce a random delay (between 0 and 2 seconds in my case) before fetching data from the database (for simulation purposes). I also used `random.seed()` to set the seed for the random number generator.
 
 - __`requests`__: Used to send HTTP requests. In my case, I used it to send data to an __AWS API Gateway endpoint__.
@@ -42,21 +44,29 @@
 
 - __API Gateway__: Used to create a __REST API__ with __Kafka REST proxy integration__ and __Kinesis REST proxy integration__.
 
-- __EC2 (Elastic Compute Cloud)__:
+- __EC2 (Elastic Compute Cloud)__: Used for deploying Kafka, Kafka Connect, creating Kafka topics, and initiating the API service.
 
-- __IAM (Identity and Access Management)__:
+- __IAM (Identity and Access Management)__: Used to manage secure access and permissions for AWS resources.
 
-- __Kinesis__:
+- __Kinesis__: Used for real-time stream processing.
 
-- __MSK (Managed Streaming for Apache Kafka)__:
+- __MSK (Managed Streaming for Apache Kafka)__: Used to integrate __Amazon S3__ with __Kafka Connect connectors__ for storage of __Kafka topics__.
 
-- __MWAA (Managed Workflows for Apache Airflow)__:
+- __MWAA (Managed Workflows for Apache Airflow)__: Used to orchestrate and manage __Apache Airflow workflows__.
 
-- __S3 (Simple Storage Service)__:
+- __S3 (Simple Storage Service)__: Used to store the __Kafka Topic__ data.
 
 ### 2.3 Databricks
 
+- __Delta Tables__: Used to store the transformed data in __Databricks__.
+
+- __Notebooks__: Used to connect to S3 buckets and perform data transformations.
+
 ### 2.4 Diagram Creators
+
+- __dbdocs__: Used for creating the database diagram.
+
+- __draw.io__: Used for creating the pipeline architecture diagrams.
 
 ## 3. Pipline Architecture
 
