@@ -70,8 +70,16 @@
 
 ## 3. Pipline Architecture
 
+In this project, I made two different data pipelines. One for __Batch Processing__, which used an ELT (_Extract, Load and Transform_) pipeline, and another for __Streaming__ which used an ETL (_Extract, Transform and Load_) pipeline. In the below subsections I will talk about their architechture, with diagrams provided.
+
 ### 3.1 Batch Processing Architechture
+
+![Batch_Processing_Architecture_diagram](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
 
 ### 3.2 Streaming Architechture
 
+![Diagrams/Streaming_Architecture](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Streaming_Architecture.png?raw=true)
+
 ## 4. The Data Used
+
+![Pinterest_Data](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
