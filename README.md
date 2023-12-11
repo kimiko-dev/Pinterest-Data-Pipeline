@@ -22,15 +22,17 @@
 
 4. [The Data Used](#4-the-data-used)
 
+5. [File Structure](#5-file-structure)
+
 ## 1. Introduction
 
 ## 2. Technologies Utilised
 
 ### 2.1 Python Libraries
 
-- `airflow`: Used to create the [__DAG__](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py) (_Directed Acyclic Graph_) for __Amazon MWAA__.
+- __`airflow`__: Used to create the __DAG__ (_Directed Acyclic Graph_) for __Amazon MWAA__.
 
-- `datetime`: Used when setting options for the [__DAG__](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py).
+- __`datetime`__: Used when setting options for the __DAG__.
 
 - __`json`__: Used to serialise Python dictionaries into a __JSON-formatted string__, to be sent to the __RESTful API__.
 
@@ -42,7 +44,9 @@
 
 - __`sqlalchemy`__: Used to create an engine which connected to the __Source Data__.
 
-- __`time`__: used to introduce delays for simulation purposes.
+- __`time`__: Used to introduce delays for simulation purposes.
+
+- __`urllib`__: Used to encode the `SECRET_KEY` when mounting __S3 buckets__ to __Databricks__.  
 
 ### 2.2 AWS Services
 
@@ -74,7 +78,7 @@
 
 ## 3. Pipline Architecture
 
-In this project, I made two different data pipelines. One for __Batch Processing__, which used an ELT (_Extract, Load and Transform_) pipeline, and another for __Streaming__ which used an ETL (_Extract, Transform and Load_) pipeline. In the below subsections I will talk about their architechture, with diagrams provided.
+In this project, I made two different data pipelines. One for __Batch Processing__, which used an ELT (_Extract, Load and Transform_) pipeline, and another for __Streaming__ which used an ETL (_Extract, Transform and Load_) pipeline. In the below subsections I will talk about their specific architechture, with diagrams provided.
 
 ### 3.1 Batch Processing Architechture
 
@@ -87,3 +91,25 @@ In this project, I made two different data pipelines. One for __Batch Processing
 ## 4. The Data Used
 
 ![Pinterest_Data](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
+
+## 5. File Structure
+
+Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
+
+```
+├── Databricks_notebooks
+│   ├── batch_processing.ipynb
+│   ├── mount_s3_buckets.ipynb
+│   └── stream_processing.ipynb
+├── Diagrams
+│   ├── Batch_Processing_Architecture.png 
+│   ├── Pinterest_Data.png
+│   └── Streaming_Architecture.png
+├── Posting_emulation_scripts
+│   ├── user_posting_emulation.py # Emulates posting data for batch processing
+│   └── user_posting_emulation_streaming.py # Emulates posting data for streaming
+├── <IAM_username>_dag.py # The DAG used on MWAA
+├── README.md
+├── journal.md
+
+```
