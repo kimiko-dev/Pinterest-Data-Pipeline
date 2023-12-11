@@ -28,6 +28,10 @@
 
 ### 2.1 Python Libraries
 
+- `airflow`: Used to create the [__DAG__](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py) (_Directed Acyclic Graph_) for __Amazon MWAA__.
+
+- `datetime`: Used when setting options for the [__DAG__](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py).
+
 - __`json`__: Used to serialise Python dictionaries into a __JSON-formatted string__, to be sent to the __RESTful API__.
 
 - __`pyspark`__: Used in __Databricks notebooks__, leveraging the native support for Spark.
