@@ -560,3 +560,17 @@ For the each specific set of data see:
 
 ### 8.6 Write the Streaming Data to Delta Tables
 ------------------------------------------------
+
+Here, I simply sent the cleaned data to __Delta Tables__ using the following function:
+
+```
+def write_kinesis_data(table_name, df):
+
+    df.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "/tmp/kinesis/_checkpoints/") \
+    .table(table_name)
+```
+
+This function also includes `.option("checkpointLocation", "/tmp/kinesis/_checkpoints/")`, which allows me to recover the previous state of a table just incase something goes wrong.
