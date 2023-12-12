@@ -122,7 +122,7 @@ After extracting rows from the __Amazon RDS__ database using [`user_posting_emul
 
 __Data Transformation__
 
-After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [batch_processing.ipynb](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
+After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
 
 For more information on __data cleaning__, see [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#61-data-cleaning).
 
