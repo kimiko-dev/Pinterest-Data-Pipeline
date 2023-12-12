@@ -96,13 +96,13 @@ The script employs logic to extract one row at a time from each table, ensuring 
 
 __Data Loading__
 
-After extracting rows from the __Amazon RDS__ database using [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), each extracted row is sent to a __REST API__ with __Kafka REST proxy integration__. It should be noted that the __client EC2 Machine__ was used to start the API. In the script, I made sure to handle errors accordingly, where the script would terminate in the event of any __status code__ which was not __`200`__.
+After extracting rows from the __Amazon RDS__ database using [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), each extracted row is sent to a __REST API__ with __Kafka REST proxy integration__. It should be noted that the __client EC2 Machine__ was used to start the API. In the script, I made sure to handle errors accordingly, where the script would terminate in the event of any __status code__ which was not __`200`__. Below, I will break down each step when the data had been sent to the __API__
 
 - __REST API Integration with Kafka__
 
   - The REST API takes the posts sent by the extraction script.
 
-  - It interfaces with a __Kafka producer__ using __MSK Connect__, using the established Kafka workers in a plugin.
+  - It interfaces with a __Kafka producer__ using __MSK Connect__, using the established Kafka workers in a plugin I set up.
 
 - __Kafka Event Streaming__
 
@@ -138,7 +138,7 @@ A __DAG__, defined in [`<IAM_username>_dag.py`](https://github.com/kimiko-dev/Pi
 
 __Architectural Diagram__
 
-The diagram below serves as a visual representation of the main architectural components within the batch processing framework.
+The diagram below is a visual representation of the main architectural components within the batch processing framework.
 
 ![Batch_Processing_Architecture_diagram](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
 
