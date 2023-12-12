@@ -82,19 +82,19 @@ In this project, I made two different data pipelines. One for __Batch Processing
 
 ### 3.1 Batch Processing Architechture
 
-![Batch_Processing_Architecture_diagram](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
+![Batch_Processing_Architecture_diagram](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
 
 ### 3.2 Streaming Architechture
 
-![Diagrams/Streaming_Architecture](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Streaming_Architecture.png?raw=true)
+![Diagrams/Streaming_Architecture](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Streaming_Architecture.png?raw=true)
 
 ## 4. The Data Used
 
-![Pinterest_Data](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
+![Pinterest_Data](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
 
 ## 5. File Structure
 
-Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/Zymeh/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
+Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
 
 ```
 ├── Databricks_notebooks
