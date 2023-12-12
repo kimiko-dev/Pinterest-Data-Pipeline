@@ -84,6 +84,8 @@ In this project, I made two different data pipelines. One for __Batch Processing
 
 ### 3.1 Batch Processing Architechture
 
+----------
+
 __Data Extraction__
 
 The source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), establishes a connection to the Amazon RDS database using specified credentials, host, and port. For security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
@@ -142,11 +144,25 @@ The diagram below serves as a visual representation of the main architectural co
 
 ### 3.2 Streaming Architechture
 
+----------
+
 __Data Extraction__
+
+
+
+----------
 
 __Data Transformation__
 
+
+
+----------
+
 __Data Loading__
+
+
+
+----------
 
 __Architectural Diagram__
 
