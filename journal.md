@@ -79,6 +79,20 @@
 ## 1. Introduction
 ------------------
 
+Welcome to my journal of making! 
+
+__*Why This Journal?*__
+
+I concieved the idea to make this since most of the work I have done is on the cloud, namely __AWS__ and __Databricks__, and I would like to showcase all the steps and skills I have gained upon deploying two functioning data pipelines.
+
+__*What to Expect?*__
+
+In the below sections, you will find a brief overview of the tasks completed and why the step is necessary. In the corresponding subsections, you will find detailed descriptions of what I did at each step.
+
+Now, without further ado, lets dive in!
+
+<sub>(P.S. I hope you enjoy your stay, it will be a long one)</sub>
+
 ## 2. Configuring the EC2 Kafka Client
 --------------------------------------
 
