@@ -50,6 +50,8 @@
 
 ### 2.2 AWS Services
 
+- __Amazon RDS__: Used to host the source data.
+
 - __API Gateway__: Used to create a __REST API__ with __Kafka REST proxy integration__ and __Kinesis REST proxy integration__.
 
 - __EC2 (Elastic Compute Cloud)__: Used for deploying Kafka, Kafka Connect, creating Kafka topics, and initiating the API service.
@@ -82,9 +84,63 @@ In this project, I made two different data pipelines. One for __Batch Processing
 
 ### 3.1 Batch Processing Architechture
 
+__Data Extraction__
+
+The source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), establishes a connection to the Amazon RDS database using specified credentials, host, and port. For security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
+
+The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
+
+__Data Loading__
+
+After extracting rows from the __Amazon RDS__ database using [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), each extracted row is sent to a __REST API__ with __Kafka REST proxy integration__. It should be noted that the __client EC2 Machine__ was used to start the API. In the script, I made sure to handle errors accordingly, where the script would terminate in the event of any __status code__ which was not __`200`__.
+
+- __REST API Integration with Kafka__
+
+  - The REST API takes the posts sent by the extraction script.
+
+  - It interfaces with a __Kafka producer__ using __MSK Connect__, using the established Kafka workers in a plugin.
+
+- __Kafka Event Streaming__
+
+  - The __Kafka producer__ writes events to a __Kafka topic__ for each post.
+
+- __Storage in S3 Buckets__
+
+  - The __Kafka topics__ are configured to store __events__ in three separate __S3 buckets__.
+
+  - Each __S3 bucket__ is named in correspondence to the type of data.
+
+- __Mounting the S3 Buckets in Databricks__
+
+  - Before any __transformations__ were made, I had to mount the __S3 buckets__ in __databricks__. The code for this can be seen in [`mount_s3_buckets.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/mount_s3_buckets.ipynb).
+
+__Data Transformation__
+
+After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [batch_processing.ipynb](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
+
+For more information on __data cleaning__, see [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#61-data-cleaning).
+
+For information on what __queries__ I ran, see [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#62-sql-queries).
+
+__Orchestration__
+
+A __DAG__, defined in [`<IAM_username>_dag.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py), had been successfully deployed on __Managed Workflows for Apache Airflow (MWAA)__ for automated batch processing. __MWAA__ utilises __Apache Airflow__ which makes it easy to schedule and monitor workflows. The __DAG__ is set to trigger daily, making it so that data transformation takes place at a consistent time each day to integrate the addition of new batch data.
+
+__Architectural Diagram__
+
+The diagram below serves as a visual representation of the main architectural components within the batch processing framework.
+
 ![Batch_Processing_Architecture_diagram](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
 
 ### 3.2 Streaming Architechture
+
+__Data Extraction__
+
+__Data Transformation__
+
+__Data Loading__
+
+__Architectural Diagram__
 
 ![Diagrams/Streaming_Architecture](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Streaming_Architecture.png?raw=true)
 
