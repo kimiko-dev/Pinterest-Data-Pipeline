@@ -90,6 +90,8 @@ The source data was extracted from an __Amazon RDS__ database. The extraction pr
 
 The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
 
+----------
+
 __Data Loading__
 
 After extracting rows from the __Amazon RDS__ database using [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), each extracted row is sent to a __REST API__ with __Kafka REST proxy integration__. It should be noted that the __client EC2 Machine__ was used to start the API. In the script, I made sure to handle errors accordingly, where the script would terminate in the event of any __status code__ which was not __`200`__.
@@ -114,6 +116,8 @@ After extracting rows from the __Amazon RDS__ database using [`user_posting_emul
 
   - Before any __transformations__ were made, I had to mount the __S3 buckets__ in __databricks__. The code for this can be seen in [`mount_s3_buckets.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/mount_s3_buckets.ipynb).
 
+----------
+
 __Data Transformation__
 
 After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [batch_processing.ipynb](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
@@ -122,9 +126,13 @@ For more information on __data cleaning__, see [here](https://github.com/kimiko-
 
 For information on what __queries__ I ran, see [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#62-sql-queries).
 
+----------
+
 __Orchestration__
 
 A __DAG__, defined in [`<IAM_username>_dag.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py), had been successfully deployed on __Managed Workflows for Apache Airflow (MWAA)__ for automated batch processing. __MWAA__ utilises __Apache Airflow__ which makes it easy to schedule and monitor workflows. The __DAG__ is set to trigger daily, making it so that data transformation takes place at a consistent time each day to integrate the addition of new batch data.
+
+----------
 
 __Architectural Diagram__
 
