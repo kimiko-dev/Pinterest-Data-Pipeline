@@ -142,7 +142,7 @@ __Architectural Diagram__
 
 The diagram below is a visual representation of the main architectural components within the batch processing framework.
 
-![Batch_Processing_Architecture_diagram](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architecture.png?raw=true)
+![Batch_Processing_Architecture_diagram](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Batch_Processing_Architectural_Diagram.png?raw=true)
 
 ### 3.2 Streaming Architechture
 
