@@ -136,22 +136,22 @@ def run_infinite_post_data_loop():
 
             # adding the 3 stream names and corresponding payloads inside of a dictionary.
             combined_data = {
-                '<stream_name_for_pin_data>': json.dumps({
-                    'StreamName': '<stream_name_for_pin_data>',
+                'streaming-0aedb74d3ba3-pin': json.dumps({
+                    'StreamName': 'streaming-0aedb74d3ba3-pin',
                     'Data': { 
                             'index': pin_result['index'], 'unique_id': pin_result['unique_id'], 'title': pin_result['title'], 'description': pin_result['description'], 'poster_name': pin_result['poster_name'], 'follower_count': pin_result['follower_count'], 'tag_list': pin_result['tag_list'], 'is_image_or_video': pin_result['is_image_or_video'], 'image_src': pin_result['image_src'], 'downloaded': pin_result['downloaded'], 'save_location': pin_result['save_location'], 'category': pin_result['category']
                             },
                     'PartitionKey': 'pin_data'
                 }),
-                '<stream_name_for_geo_data>': json.dumps({
-                    'StreamName': '<stream_name_for_geo_data>',
+                'streaming-0aedb74d3ba3-geo': json.dumps({
+                    'StreamName': 'streaming-0aedb74d3ba3-geo',
                     'Data': {
                             'ind': geo_result['ind'], 'timestamp': geo_result['timestamp'].isoformat(), 'latitude': geo_result['latitude'], 'longitude': geo_result['longitude'], 'country': geo_result['country']
                             },
                     'PartitionKey': 'geo_data'
                 }),
-                '<stream_name_for_user_data>': json.dumps({
-                    'StreamName': '<stream_name_for_user_data>',
+                'streaming-0aedb74d3ba3-user': json.dumps({
+                    'StreamName': 'streaming-0aedb74d3ba3-user',
                     'Data': {                        
                             'ind': user_result['ind'], 'first_name': user_result['first_name'], 'last_name': user_result['last_name'], 'age': user_result['age'], 'date_joined': user_result['date_joined'].isoformat()
                             },
@@ -161,7 +161,7 @@ def run_infinite_post_data_loop():
 
             # now sending the data to the API
             for stream, payload in combined_data.items():
-                stream_data(<Invoke_URL>, stream, payload) 
+                stream_data('https://80i5yineik.execute-api.us-east-1.amazonaws.com/dev', stream, payload) 
 
 if __name__ == "__main__":
     run_infinite_post_data_loop()
