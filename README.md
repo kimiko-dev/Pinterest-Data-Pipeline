@@ -22,6 +22,16 @@
 
 4. [The Data](#4-the-data)
 
+    4.1 [`pin_table`](#41-pin_table)
+
+    4.2 [`geo_table`](#42-geo_table)
+
+    4.3 [`user_table`](#43-user_table)
+
+    4.4 [`The Database Diagram`](#44-the-database-diagram)
+
+    4.5 [`Querying the Data`](#45-querying-the-data)
+
 5. [File Structure](#5-file-structure)
 
 ## 1. Introduction
