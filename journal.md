@@ -83,7 +83,7 @@ Welcome to my journal of making!
 
 __*Why This Journal?*__
 
-I concieved the idea to make this since most of the work I have done is on the cloud, namely __AWS__ and __Databricks__, and I would like to showcase all the steps and skills I have gained upon deploying two functioning data pipelines.
+I concieved the idea to make this since most of the work I have done is on the cloud, namely __AWS__ and __Databricks__, and I would like to showcase all the steps and skills I have gained upon deploying two functional data pipelines.
 
 __*What to Expect?*__
 

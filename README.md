@@ -92,6 +92,8 @@ The source data was extracted from an __Amazon RDS__ database. The extraction pr
 
 The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
 
+For further information, please consult the docstrings in the script [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py).
+
 ----------
 
 __Data Loading__
@@ -100,9 +102,9 @@ After extracting rows from the __Amazon RDS__ database using [`user_posting_emul
 
 - __REST API Integration with Kafka__
 
-  - The REST API takes the posts sent by the extraction script.
+  - The REST API receives the posts sent by the extraction script.
 
-  - It interfaces with a __Kafka producer__ using __MSK Connect__, using the established Kafka workers in a plugin I set up.
+  - It communictes with a __Kafka producer__ via __MSK Connect__, using the established __Kafka workers__ in a plugin I set up.
 
 - __Kafka Event Streaming__
 
@@ -110,13 +112,13 @@ After extracting rows from the __Amazon RDS__ database using [`user_posting_emul
 
 - __Storage in S3 Buckets__
 
-  - The __Kafka topics__ are configured to store __events__ in three separate __S3 buckets__.
+  - The __Kafka topics__ are configured to store __events__ in three distinct __S3 buckets__.
 
-  - Each __S3 bucket__ is named in correspondence to the type of data.
+  - Each __S3 bucket__ is named to correspond with the data type it contains.
 
 - __Mounting the S3 Buckets in Databricks__
 
-  - Before any __transformations__ were made, I had to mount the __S3 buckets__ in __databricks__. The code for this can be seen in [`mount_s3_buckets.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/mount_s3_buckets.ipynb).
+  - Before any __transformations__ were made, I had to mount the __S3 buckets__ in __databricks__, which will make the data in the S3 buckets accessible within the __Databricks workspace__. The code for this can be seen in [`mount_s3_buckets.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/mount_s3_buckets.ipynb).
 
 ----------
 
@@ -148,12 +150,17 @@ The diagram below is a visual representation of the main architectural component
 
 __Data Extraction__
 
+Similar to before, the source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_streaming.py), establishes a connection to the Amazon RDS database using specified credentials, host, and port. Again, for security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
 
+The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
+
+For further information, please consult the docstrings in the script [`user_posting_emulation_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_streaming.py).
 
 ----------
 
 __Data Transformation__
 
+Upon sending the extracted data to the __API__, the data was picked up by __Amazon Kinesis__ and was sent into streams
 
 
 ----------
