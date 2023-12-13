@@ -173,11 +173,11 @@ __Data Loading__
 
 __Architectural Diagram__
 
-![Diagrams/Streaming_Architecture](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Streaming_Architecture.png?raw=true)
+![Diagrams/Streaming_Architecture](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Stream_Processing_Architectural_Diagram.png?raw=true)
 
 ## 4. The Data Used
 
-![Pinterest_Data](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Stream_Processing_Architectural_Diagram.png?raw=true)
+![Pinterest_Data](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
 
 ## 5. File Structure
 
