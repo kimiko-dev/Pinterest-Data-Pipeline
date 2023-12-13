@@ -20,7 +20,7 @@
 
     3.2 [Streaming Architechture](#32-streaming-architechture)
 
-4. [The Data Used](#4-the-data-used)
+4. [The Data](#4-the-data)
 
 5. [File Structure](#5-file-structure)
 
@@ -36,7 +36,9 @@
 
 - __`json`__: Used to serialise Python dictionaries into a __JSON-formatted string__, to be sent to the __RESTful API__.
 
-- __`pyspark`__: Used in __Databricks notebooks__, leveraging the native support for Spark.
+- __`pyspark.sql.functions`__ : Used in __Databricks notebooks__, for manipulating and transforming data in __Spark DataFrames__.
+
+- __`pyspark.sql.types`__ : Used in __Databricks notebooks__, for defining the structure of data in __Spark DataFrames__.
 
 - __`random`__: Used to introduce a random delay (between 0 and 2 seconds in my case) before fetching data from the database (for simulation purposes). I also used `random.seed()` to set the seed for the random number generator.
 
@@ -46,7 +48,7 @@
 
 - __`time`__: Used to introduce delays for simulation purposes.
 
-- __`urllib`__: Used to encode the `SECRET_KEY` when mounting __S3 buckets__ to __Databricks__.  
+- __`urllib`__: Used to encode the `SECRET_KEY` when mounting __S3 buckets__ to __Databricks__, and reading __Kinesis Data Streams__.  
 
 ### 2.2 AWS Services
 
@@ -68,7 +70,7 @@
 
 ### 2.3 Databricks
 
-- __Delta Tables__: Used to store the transformed data in __Databricks__.
+- __Delta Tables__: Used to store processed tables, they provide a reliable and scalable storage solution with support for __ACID transactions__.
 
 - __Notebooks__: Used to connect to S3 buckets and perform data transformations.
 
@@ -88,7 +90,7 @@ In this project, I made two different data pipelines. One for __Batch Processing
 
 __Data Extraction__
 
-The source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), establishes a connection to the Amazon RDS database using specified credentials, host, and port. For security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
+The source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py), establishes a connection to the __Amazon RDS__ database using specified credentials. For security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
 
 The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
 
@@ -124,7 +126,7 @@ After extracting rows from the __Amazon RDS__ database using [`user_posting_emul
 
 __Data Transformation__
 
-After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
+After the __S3 buckets__ had been mounted, data transformations (cleaning and querying) were applied using the __notebook__ [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb) in __Databricks__. The seamless integration of __Spark__ with __Databricks__ played a key role in ensuring the efficiency of the transformation processes.
 
 For more information on __data cleaning__, see [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#61-data-cleaning).
 
@@ -150,7 +152,7 @@ The diagram below is a visual representation of the main architectural component
 
 __Data Extraction__
 
-Similar to before, the source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_streaming.py), establishes a connection to the Amazon RDS database using specified credentials, host, and port. Again, for security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
+Similar to before, the source data was extracted from an __Amazon RDS__ database. The extraction process involved three tables: `pin data`, `geo data`, and `user data`. The extraction script, [`user_posting_emulation_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_streaming.py), establishes a connection to the __Amazon RDS__ database using specified credentials. Again, for security purposes, these credentials are stored in a separate file, which were loaded into the script during execution.
 
 The script employs logic to extract one row at a time from each table, ensuring that the rows correspond to each other. This is key to emulate real-time Pinterest posting by users.
 
@@ -160,22 +162,43 @@ For further information, please consult the docstrings in the script [`user_post
 
 __Data Transformation__
 
-Upon sending the extracted data to the __API__, the data was picked up by __Amazon Kinesis__ and was sent into streams
+Upon sending the extracted data to the __API__ , the data was picked up by __Amazon Kinesis__ thanks to the __API Gateway__ which had __Kinesis proxy integration__ configured. Then within __Kinesis__ service, the data was organised into streams, that I configured [here](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md#81-create-data-streams-using-kinesis-data-streams).
 
+Next I read the data from the __Kinesis streams__ to __Databricks__, and then cleaned the data in __Databricks__ using the native __Spark__ functions. This process can be seen in the __notebook__ [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb). 
 
 ----------
 
 __Data Loading__
 
-
+After cleaning the data in Databricks using native __Spark__ functions, the processed tables were uploaded to __Delta Tables__. __Delta Tables__ provide a reliable and scalable storage solution with support for __ACID transactions__.
 
 ----------
 
 __Architectural Diagram__
 
+The diagram below is a visual representation of the main architectural components within the stream processing framework.
+
 ![Diagrams/Streaming_Architecture](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Stream_Processing_Architectural_Diagram.png?raw=true)
 
-## 4. The Data Used
+## 4. The Data
+
+We have 3 tables, namely `pin_table`, `geo_table` and `user_table`. Let's break them down:
+
+#### 1. `pin_table`
+
+| Data | Description |
+| ---- | ----------- |
+| `ind` | The index of that row |
+| `unique_id` | A UUID associated with the Pinterest post |
+| `title` | The title of the Pinterest post |
+| `description` | The discription of the Pinterest post |
+| `follower_count` | The number of followers the Pinterest poster has |
+| `poster_name` | The name of the Pinterest poster |
+| `tag_list` |  |
+| `is_image_or_video` |  |
+| `image_src` |  |
+| `save_location` |  |
+| `category` |  |
 
 ![Pinterest_Data](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
 
