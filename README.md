@@ -170,7 +170,7 @@ Next I read the data from the __Kinesis streams__ to __Databricks__, and then cl
 
 __Data Loading__
 
-After cleaning the data in Databricks using native __Spark__ functions, the processed tables were uploaded to __Delta Tables__. __Delta Tables__ provide a reliable and scalable storage solution with support for __ACID transactions__.
+After cleaning the data in Databricks, the __Spark Dataframes__ were uploaded to __Delta Tables__, where further analysis can be done. For example __ACID transactions__.
 
 ----------
 
@@ -184,7 +184,9 @@ The diagram below is a visual representation of the main architectural component
 
 We have 3 tables, namely `pin_table`, `geo_table` and `user_table`. Let's break them down:
 
-#### 1. `pin_table`
+### 4.1 `pin_table`
+
+This table contains information about the Pinterest post data
 
 | Data | Description |
 | ---- | ----------- |
@@ -194,13 +196,52 @@ We have 3 tables, namely `pin_table`, `geo_table` and `user_table`. Let's break 
 | `description` | The discription of the Pinterest post |
 | `follower_count` | The number of followers the Pinterest poster has |
 | `poster_name` | The name of the Pinterest poster |
-| `tag_list` |  |
-| `is_image_or_video` |  |
-| `image_src` |  |
-| `save_location` |  |
-| `category` |  |
+| `tag_list` | The list of user defined tags for the Pinterest post |
+| `is_image_or_video` | The type of media file the Pinterest post is |
+| `image_src` | The Pinterest Post thumbnail |
+| `save_location` | The file path of the Pinterest post |
+| `category` | The category of the Pinterest post |
+
+### 4.2 `geo_table`
+
+This table contains information about the Geolocation data connected to the Pinterest post
+
+| Data | Description |
+| ---- | ----------- |
+| `ind` | The index of that row |
+| `country` | The country the post was made |
+| `timestamp` | The date and time for when the post was made |
+| `coordinates` | The geographical coordinates for the location the post was made |
+
+### 4.3 `user_table`
+
+This table contains information about the User data connected to the Pinterest post
+
+| Data | Description |
+| ---- | ----------- |
+| `ind` | The index of that row |
+| `user_name` | The users first and last name |
+| `age` | The age of the user |
+| `date_joined` | The date and time for when the user made their account |
+
+### 4.4 The Database Diagram
+
+Below is the database diagram which shows how the data is related to each other. This will be useful for querying the data.
 
 ![Pinterest_Data](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Diagrams/Pinterest_Data.png?raw=true)
+
+### 4.5 Querying the Data
+
+Below are some questions one could run queries on:
+
+- Find the most popular category in each country.
+- Find how many posts each category had between 2018 and 2022.
+- Find the user with the most followers in each country.
+- Find which was the most popular for different age groups.
+- Find the median follower count for different age groups.
+- Find how many users have joined between 2015 and 2020.
+- Find the median follower count of users have joined between 2015 and 2020.
+- Find the median follower count of users that have joined between 2015 and 2020, based on which age group they are part of.
 
 ## 5. File Structure
 
