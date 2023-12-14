@@ -36,6 +36,12 @@
 
 ## 1. Introduction
 
+In this project designated by [AiCore](https://www.theaicore.com/), I've deployed two robust data pipelines, each serving a distinct purpose: a __Batch Processing Pipeline__ and a __Stream Processing Pipeline__. These pipelines are precisely tuned to seamlessly integrate the collection of data, paving the way for efficient and tailored data transformations.
+
+Throughout this project, I gained valuable expertise in navigating the intricacies of AWS, delving into key components like __API proxy integrations__, __Amazon Kinesis__, and __Amazon MWAA__ (just to name a few!). The journey included a deep dive into the nuances of the data pipeline by building Pipeline Architecture diagrams, reinforcing my understanding of end-to-end pipeline processes. The experience has been instrumental in honing my skills with integral components of a data pipeline, specifically __Apache Kafka__, __Apache Spark__, and __Databricks__. These technologies now stand as pillars in my Data Engineering toolkit, contributing to a comprehensive understanding of building efficient and scalable data pipelines.
+
+Before you begin, I implore you to take a look at my journal of making.  As a significant portion of the project operates in the cloud, this journal (available at [`journal.md`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md)) serves as a comprehensive account of everything that transpired during the development process, providing a detailed narrative that adds context and depth to the entire project journey.
+
 ## 2. Technologies Utilised
 
 ### 2.1 Python Libraries
@@ -76,13 +82,13 @@
 
 - __MWAA (Managed Workflows for Apache Airflow)__: Used to orchestrate and manage __Apache Airflow workflows__.
 
-- __S3 (Simple Storage Service)__: Used to store the __Kafka Topic__ data.
+- __S3 (Simple Storage Service)__: Used to store the __Kafka Topic__ data, serving as a __Data Lake__. I also stored a __DAG__ here, which was used by __MWAA__
 
 ### 2.3 Databricks
 
 - __Delta Tables__: Used to store processed tables, they provide a reliable and scalable storage solution with support for __ACID transactions__.
 
-- __Notebooks__: Used to connect to S3 buckets and perform data transformations.
+- __Notebooks__: Used to read data from __S3 buckets__ and __Kinesis streams__, as well as performing data transformations.
 
 ### 2.4 Diagram Creators
 
@@ -180,7 +186,7 @@ Next I read the data from the __Kinesis streams__ to __Databricks__, and then cl
 
 __Data Loading__
 
-After cleaning the data in Databricks, the __Spark Dataframes__ were loaded to __Delta Tables__ (using a function I made in [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb)), where further analysis can be done. For example __ACID transactions__.
+After cleaning the data in Databricks, the __Spark Dataframes__ were loaded to __Delta Tables__ (using a function I made in [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb)). If needed, further analysis can be done. For example __ACID transactions__.
 
 ----------
 
@@ -192,11 +198,11 @@ The diagram below is a visual representation of the main architectural component
 
 ## 4. The Data
 
-We have 3 tables, namely `pin_table`, `geo_table` and `user_table`. Let's break them down:
+After the data has processed in each of the pipelines, we end up with three tables, namely `pin_table`, `geo_table` and `user_table`. Let's break them down:
 
 ### 4.1 `pin_table`
 
-This table contains information about the Pinterest post data
+This table contains information about the Pinterest post data.
 
 | Data | Description |
 | ---- | ----------- |
@@ -214,7 +220,7 @@ This table contains information about the Pinterest post data
 
 ### 4.2 `geo_table`
 
-This table contains information about the Geolocation data connected to the Pinterest post
+This table contains information about the Geolocation data connected to the Pinterest post.
 
 | Data | Description |
 | ---- | ----------- |
@@ -225,7 +231,7 @@ This table contains information about the Geolocation data connected to the Pint
 
 ### 4.3 `user_table`
 
-This table contains information about the User data connected to the Pinterest post
+This table contains information about the User data connected to the Pinterest post.
 
 | Data | Description |
 | ---- | ----------- |
@@ -255,7 +261,7 @@ Below are some questions one could run queries on:
 
 ## 5. File Structure
 
-Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
+Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before, since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
 
 ```
 ├── Databricks_notebooks
