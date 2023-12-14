@@ -28,9 +28,9 @@
 
     4.3 [`user_table`](#43-user_table)
 
-    4.4 [`The Database Diagram`](#44-the-database-diagram)
+    4.4 [The Database Diagram](#44-the-database-diagram)
 
-    4.5 [`Querying the Data`](#45-querying-the-data)
+    4.5 [Querying the Data](#45-querying-the-data)
 
 5. [File Structure](#5-file-structure)
 
@@ -180,7 +180,7 @@ Next I read the data from the __Kinesis streams__ to __Databricks__, and then cl
 
 __Data Loading__
 
-After cleaning the data in Databricks, the __Spark Dataframes__ were uploaded to __Delta Tables__, where further analysis can be done. For example __ACID transactions__.
+After cleaning the data in Databricks, the __Spark Dataframes__ were loaded to __Delta Tables__ (using a function I made in [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb)), where further analysis can be done. For example __ACID transactions__.
 
 ----------
 
