@@ -99,7 +99,7 @@ Now, without further ado, lets dive in!
 ### 2.1 Create a `.pem` Key File Locally
 ----------------------------------------
 
-Upon signing into my AWS account, I navigated to the __Parameter Store__. I searched the parameters ussing my `SSH Keypair ID`. Under __Parameter details__, I found the and decrypted the `Value`, revealing an _RSA private key_. I copied and pasted this key into a new `.pem` file, making sure this was created in the correct folder I wanted to connect to the __EC2 instance__ in. However, we need to name this file as `<Key pair assigned at launch>.pem`. To identify the `Key pair assigned at launch`, I went to the __Instances__ section located in the __EC2 Service__. I found the correct instance by referencing my __AWS IAM Username__, and then accessed the __instance summary__. In the __details__ section, I found `Key pair assigned at launch`, which I copy and pasted as the filename.
+Upon signing into my AWS account, I navigated to the __Parameter Store__. I searched the parameters using my `SSH Keypair ID`. Under __Parameter details__, I found the and decrypted the `Value`, revealing an _RSA private key_. I copied and pasted this key into a new `.pem` file, making sure this was created in the correct folder I wanted to connect to the __EC2 instance__ in. However, we need to name this file as `<Key pair assigned at launch>.pem`. To identify the `Key pair assigned at launch`, I went to the __Instances__ section located in the __EC2 Service__. I found the correct instance by referencing my __AWS IAM Username__, and then accessed the __instance summary__. In the __details__ section, I found `Key pair assigned at launch`, which I copy and pasted as the filename.
 
 ### 2.2 Connect to the EC2 Instance
 -----------------------------------
@@ -111,7 +111,7 @@ I needed to connect to the __EC2 instance__ on an __SSH client__. I am using __W
 
 I need to download and install __Kafka__ on my __client EC2 machine__. I have already been proivded with access to an __IAM authenticated MSK cluster__, so I did not have to do this in the project. On the __EC2 client__, I first had to install __Java__, with following command `sudo yum install java-1.8.0`. Since the cluster I was using was running on __Kafka 2.12-2.8.1__, I had to make sure that I dowloaded the correct version of __Kafka__ on my __client EC2 machine__. The command for this is: `wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz`. With the file downloaded, I then used `tar -xzf kafka_2.12-2.8.1.tgz` to extract all the files needed for __Kafka__. 
 
-Following this, I needed to download the __IAM MSK authentication package__ on my __client EC2 machine__. First I navigated to the `libs` folder inside the __Kafka 2.12-2.8.1__ folder (the filepath is `/home/ec2-user/kafka_2.12-2.8.1/libs`). Then, I used the command `wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.5/aws-msk-iam-auth-1.1.5-all.jar`. Before I continued, I navigated to the __Roles__ section in the __IAM console__. It gave me a list of roles, then I had to find the role which was named `<your_UserId>-ec2-access-role`. In this role, I made note of the __ARN__ (_Amazon Resource Name_) in the __Summary__ section. Below the __Summary__ section, I selected the __Trust relationships__ tab, and then hit __Edit trust policy__. Here, I clicked on the __Add a principal__ button and selected __IAM roles__ as the __Principal type__. I had to then paste my __ARN__ in the box below. Upon doing this, I hit the __Add principal__ button, which successfully gave me the __IAM role__, which contains the necessary permissions to authenticate to the __MSK cluster__.
+Following this, I needed to download the __IAM MSK authentication package__ on my __client EC2 machine__. First I navigated to the `libs` folder inside the __Kafka 2.12-2.8.1__ directory (the filepath is `/home/ec2-user/kafka_2.12-2.8.1/libs`). Then, I used the command `wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.5/aws-msk-iam-auth-1.1.5-all.jar`. Before I continued, I navigated to the __Roles__ section in the __IAM console__. It gave me a list of roles, where I had to find the role which was named `<your_UserId>-ec2-access-role`. In this role, I made note of the __ARN__ (_Amazon Resource Name_) in the __Summary__ section. Below the __Summary__ section, I selected the __Trust relationships__ tab, and then hit __Edit trust policy__. Here, I clicked on the __Add a principal__ button and selected __IAM roles__ as the __Principal type__. I had to then paste my __ARN__ in the box below. Upon doing this, I hit the __Add principal__ button, which successfully gave me the __IAM role__, as this contains the necessary permissions to authenticate to the __MSK cluster__.
 
 Now, I needed to configure my Kafka client to use AWS IAM authentication on the cluster. To do this, I headed to `/home/ec2-user/kafka_2.12-2.8.1/bin` and edited the `client.properties` file. In here, I added the following:
 
@@ -131,19 +131,19 @@ sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallb
 ```
 where I replaced `<my_ARN>` with the __ARN__ I noted down before.
 
-Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is located at `/home/ec2-user/.bashrc`. When editing, I added the line: `export CLASSPATH=/home/ec2-user/kafka_2.12-2.8.1/libs/aws-msk-iam-auth-1.1.5-all.jar`. Also, while I was here, I made sure to add in `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.382.b05-1.amzn2.0.2.x86_64/jre` too. To make sure the environment variables were set correctly, I wrote the following commands `echo $CLASSPATH` and `echo $JAVA_HOME`
+Finally, I had to set up the `CLASSPATH` in the `.bashrc` file. This file is located at `/home/ec2-user/.bashrc`. When editing, I added the line: `export CLASSPATH=/home/ec2-user/kafka_2.12-2.8.1/libs/aws-msk-iam-auth-1.1.5-all.jar`. Also, while I was here, I made sure to add in `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.382.b05-1.amzn2.0.2.x86_64/jre` too. To make sure the environment variables were set correctly, I wrote the following commands `echo $CLASSPATH` and `echo $JAVA_HOME`, both returing the correct filepaths.
 
 ### 2.4 Create Kafka Topics
 ---------------------------
 
-Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__, clicked on the appropriate __cluster__ and clicked on __View client information__. The `Bootstrap servers string` was in the __Bootstrap servers__ box, in the __Private endpoint (single-VPC)__ column. Scrolling down, I found the `Plaintext Apache Zookeeper connection string` in the __Apache ZooKeeper connection__, where I copied the _Plaintext_ string. 
+Before creating the __Kafka topics__, I needed to note down the `Bootstrap servers string` and the `Plaintext Apache Zookeeper connection string`. To retreive these, I headed to the __MSK Management Console__, clicked on the appropriate __cluster__, and clicked on __View client information__. The `Bootstrap servers string` was in the __Bootstrap servers__ box, under the __Private endpoint (single-VPC)__ column. Scrolling down, I found the `Plaintext Apache Zookeeper connection string` under __Apache ZooKeeper connection__, where I copied the _Plaintext_ string. 
 
 Now we can create the three following topics:
 - `<your_UserId>.pin` for the Pinterest posts data
 - `<your_UserId>.geo` for the post geolocation data
 - `<your_UserId>.user` for the post user data
 
-To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8.1/bin`, then wrote the following command `./kafka-console-producer.sh --bootstrap-server <BootstrapServerString> --producer.config client.properties --group students --topic <topic_name>`. Where I made sure to replace the `BootstrapServerString` with the one I obtained previously, and also replaced `<topic_name>` appropriately (we need to make 3 topics, so I used this command three times each with the desired topic names.)
+To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8.1/bin`, where I executed the following command `./kafka-console-producer.sh --bootstrap-server <BootstrapServerString> --producer.config client.properties --group students --topic <topic_name>`. I made sure to replace the `BootstrapServerString` with the one I obtained previously, and also replaced `<topic_name>` appropriately (we need to make 3 topics, so I used this command three times each with the desired topic names.)
 
 ## 3. Connect a MSK Cluster to a S3 Bucket
 ------------------------------------------
@@ -191,18 +191,18 @@ For this project, I did not need to create my own __API__ since one had already 
 ### 4.1 Building a Kafka REST Proxy Integration Method for the API
 ------------------------------------------------------------------
 
-First of all, I navigated to the __EC2 instances__ and found my __client EC2 machine__ and selected it. In the __Details__ section, I found the __Public IPv4 DNS__ and made note of it for later use.
+First of all, I navigated to the __EC2 instances__, found my __client EC2 machine__ and selected it. In the __Details__ section, I found the __Public IPv4 DNS__ and made note of it for later use.
 
 On the __API Gateway__, I searched for the __API__ which had been setup for me. Upon finding it, I clicked on it which took me to the __Resources__ page. Here, I clicked on the __Create resource__ button, which took me to a set up screen. Now, I made sure to turn on __Proxy resource__, I set the __Resource path__ as `/{proxy+}` and set the __Resource name__ as `{proxy+}`. Lastly, I selected the __CORS (Cross Origin Resource Sharing)__ box and then hit __Create resource__.
 
 When clicking on the new resource I had just created, I pressed the __Create method__ button as I wanted to create a __HTTP ANY method__. For the __Method type__ I selected __ANY__ in the dropdown box. For __Integration type__, I selected __HTTP Proxy__. Finally, for the __Endpoint URL__, I wrote the following `http://<Public IPv4 DNS>:8082/{proxy}`. I then clicked __Create Method__, which successfully created the method. 
 
-Now, I needed to get __Invoke URL__. To do this, I simply pressed the __Deploy API__ button, created a new __Stage__ called `dev` and then deployed the API. It took me to the __Stages__ page on the __API Gateway__ where it gave me the __Invoke URL__, and I noted this down. 
+Now, I needed to get __Invoke URL__. To do this, I simply pressed the __Deploy API__ button, created a new __Stage__ called `dev` and then deployed the __API__. It took me to the __Stages__ page on the __API Gateway__ where it gave me the __Invoke URL__, and I noted this down. 
 
 ### 4.2 Setting Up the Kafka REST Proxy on the EC2 Client
 ---------------------------------------------------------
 
-On the __client EC2 machine__ I had to install __Confluent package__ for the __Kafka REST Proxy__. To do this, I ran the following commands: `sudo wget https://packages.confluent.io/archive/7.2/confluent-7.2.0.tar.gz` (which downloads the __Confluent package__) and then `tar -xvzf confluent-7.2.0.tar.gz ` (which extracts and decompresses the contents of `confluent-7.2.0.tar.gz`)
+On the __client EC2 machine__, I had to install __Confluent package__ for the __Kafka REST Proxy__. To do this, I ran the following commands: `sudo wget https://packages.confluent.io/archive/7.2/confluent-7.2.0.tar.gz` (which downloads the __Confluent package__) and then `tar -xvzf confluent-7.2.0.tar.gz ` (which extracts and decompresses the contents of `confluent-7.2.0.tar.gz`)
 
 Next, on the __client EC2 machine__ I navigated to `/home/ec2-user/confluent-7.2.0/etc/kafka-rest` where I modified the `kafka-rest.properties` file, where I changed the `bootstrap.servers` and the `zookeeper.connect` variables in this file, with the corresponding **Boostrap server string** and **Plaintext Apache Zookeeper connection string** (these are the ones from [2.4](#24-create-kafka-topics)). On top of this, I had to surpass the __IAM authentecation__ of the __MSK cluster__, so similar to [before](#23-set-up-kafka-on-the-ec2-client) (and making use of the __IAM MSK authentication package__), I added the following to the `kafka-rest.properties` file:
 
@@ -227,7 +227,7 @@ To make sure everything was in working order, I started the __REST proxy__ on th
 ### 4.3 Send Data to the API
 ----------------------------
 
-Here, I edited the `user_posting_emulation.py` file which was supplied to us. I added a function which took in the arguments: data obtained from a source, and the topic name of the topic I needed to send that data to.
+Here, I edited the [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py) file which was supplied to us. I added a function which took in the arguments: data obtained from a source, and the topic name of the topic I needed to send that data to.
 
 ## 5. Setting up Databricks
 ---------------------------
@@ -361,6 +361,8 @@ I utilised the native __pyspark__ integration on __Databricks__  to create the q
 - Find the median follower count of users have joined between 2015 and 2020.
 - Find the median follower count of users that have joined between 2015 and 2020, based on which age group they are part of.
 
+You can find the __Databricks Notebook__ for __cleaning__ and __querying__ here: [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb).
+
 ## 7. AWS MWAA
 --------------
 
@@ -369,7 +371,7 @@ In this section, I did not need to create a __S3 Bucket__ for __MWAA__, and I al
 ### 7.1 Create and Upload a DAG to a MWAA Environment
 -----------------------------------------------------
 
-To create the __DAG__, I made a new python script, which was labled `<IAM_Username>-dag.py` (the file had to be called this since I only had permission to upload a file titled this). In this file, I simply wrote the following code:
+To create the __DAG__, I made a new python script, [`<IAM_Username>-dag.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/%3CIAM_username%3E_dag.py) (the file had to be called this since I only had permission to upload a file titled this). In this file, I simply wrote the following code:
 
 ```
 #Define params for Submit Run Operator
@@ -416,7 +418,7 @@ After making sure the setup was correct, I uploaded the `<IAM_Username>-dag.py` 
 ### 7.2 Trigger a DAG that Runs a Databricks Notebook
 -----------------------------------------------------
 
-First, I navigated to the __MWAA console__, and in the __Environments__ section, I found the correct environment `Databricks-Airflow-env`, and then clicked on __Open Airflow UI__, which took me to the __Airflow UI__. I was presented with a list of __DAG__\s, where I found I found the __DAG__ I had just created. After I clicked on my __DAG__, I unpaused my it and it started to get to work. After 6 minutes, the __DAG__ was finished and I was greeted with a _dark green_ box in the __Tree__ section of my __DAG__ indicating that it had been successfully ran! 
+First, I navigated to the __MWAA console__, and in the __Environments__ section, I found the correct environment `Databricks-Airflow-env`, and then clicked on __Open Airflow UI__, which took me to the __Airflow UI__. I was presented with a list of __DAGs__, where I found I found the __DAG__ I had just created. After I clicked on my __DAG__, I clicked unpause and it started to get to work. After 6 minutes, the __DAG__ was finished and I was greeted with a _dark green_ box in the __Tree__ section of my __DAG__ indicating that it had been successfully ran! 
 
 ## 8 AWS Kinesis
 ----------------
@@ -424,7 +426,7 @@ First, I navigated to the __MWAA console__, and in the __Environments__ section,
 ### 8.1 Create Data Streams Using Kinesis Data Streams
 ------------------------------------------------------
 
- I had to create three __Data streams__ which correspond to each table. So I navigated to the __Kinesis console__, and in the __Data streams__ section, I pressed on the __Create data streams__ button. This took me to a page for the __Data stream configuration__. For the __Data stream name__, I called the three seperate streams `streaming-<IAM_username>-pin`,`streaming-<IAM_username>-pin` and `streaming-<IAM_username>-pin` (these streams had to be called this as I only had permission to create __data streams__ named this way). And for all three, I made sure that the __Capacity mode__ which was selected was infact __On-demand__.
+ I had to create three __Data streams__ which correspond to each table. So I navigated to the __Kinesis console__, and in the __Data streams__ section I pressed on the __Create data streams__ button. This took me to a page for the __Data stream configuration__. For the __Data stream name__, I called the three seperate streams `streaming-<IAM_username>-pin`,`streaming-<IAM_username>-pin` and `streaming-<IAM_username>-pin` (these streams had to be called this as I only had permission to create __Data streams__ named this way). And for all three, I made sure that the __Capacity mode__ which was selected was infact __On-demand__.
 
 ### 8.2 Configure an API with Kinesis Proxy Integration
 -------------------------------------------------------
@@ -560,7 +562,31 @@ Here, I edited the `user_posting_emulation.py` file last seen [here](#43-send-da
 ### 8.4 Read Data from the Kinesis Streams in Databricks
 --------------------------------------------------------
 
-After creating a new __Notebook__ in __Databricks__\, I read the file `authentication_credentials.csv`, and retrieved the __`Access Key`__ and the __`Secret Access Key`__. This is exactly the same as [before](#51-mounting-a-s3-bucket-to-databricks), so I will spare you the details here. I made a function which reads the __Kinesis Stream__ data and transforms it into a usable dataframe ready for further transformation. To see the function, please see this [notebook]().
+After creating a new __Notebook__ in __Databricks__\, I read the file `authentication_credentials.csv`, and retrieved the __`Access Key`__ and the __`Secret Access Key`__. This is exactly the same as [before](#51-mounting-a-s3-bucket-to-databricks), so I will spare you the details here. I made a function which reads the __Kinesis Stream__ data and transforms it into a usable dataframe ready for further transformation. The function is:
+
+```
+def read_kinesis_data(stream_name, json_schema):
+
+    # Creating the kinesis_stream dataframe
+    kinesis_stream = spark \
+        .readStream \
+        .format('kinesis') \
+        .option('streamName', stream_name) \
+        .option('initialPosition', 'earliest') \
+        .option('region', 'us-east-1') \
+        .option('awsAccessKey', ACCESS_KEY) \
+        .option('awsSecretKey', SECRET_KEY) \
+        .load()
+
+    # deserialising the data
+    df = kinesis_stream \
+    .selectExpr("CAST(data as STRING)") \ 
+    .withColumn("data", from_json(col("data"), json_schema)) \ 
+    .select(col("data.*")) 
+    return df
+```
+
+For the docstrings, please see [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb).
 
 ### 8.5 Transform Kinesis streams in Databricks
 -----------------------------------------------
@@ -571,6 +597,8 @@ For the each specific set of data see:
 - [Cleaning the Pinterest Post Data](#611-cleaning-the-pinterest-post-data)
 - [Cleaning the Geolocation Data](#612-cleaning-the-geolocation-data)
 - [Cleaning the User Data](#613-cleaning-the-user-data)
+
+To see the implementation, please see [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb).
 
 ### 8.6 Write the Streaming Data to Delta Tables
 ------------------------------------------------
@@ -588,3 +616,13 @@ def write_kinesis_data(table_name, df):
 ```
 
 This function also includes `.option("checkpointLocation", "/tmp/kinesis/_checkpoints/")`, which allows me to recover the previous state of a table just incase something goes wrong.
+
+For the docstrings, please see [`stream_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/stream_processing.ipynb).
+
+
+------
+
+
+
+
+<sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appriciate you finding me here! As a reward, take this :star2:)</sub>
