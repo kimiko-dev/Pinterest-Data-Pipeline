@@ -625,4 +625,4 @@ For the docstrings, please see [`stream_processing.ipynb`](https://github.com/ki
 
 
 
-<sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appriciate you finding me here! As a reward, take this :star2:)</sub>
+<sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appreciate you finding me here! As a reward, take this :star2:)</sub>
