@@ -96,6 +96,14 @@ Now, without further ado, lets dive in!
 ## 2. Configuring the EC2 Kafka Client
 --------------------------------------
 
+<ins>__Overview__</ins> :
+
+I connected to a __client EC2 machine__, configured __Kafka__ and created __Kafka topics__.
+
+<ins>__Fundamental Importance__</ins> :
+
+Simply put, the __client EC2 machine__ is what hosts __Kafka__. The data sent to the __API__ will be rerouted to this instance (through __Kafka proxy integration__, but more on this later) and picked up by __Kafka Producers__, who then writes to a __Kafka topic__ for each bit of data sent. Using __Kafka__ here is important since we can send the data to storage as soon as it gets picked up by the __API__. We will discuss how the data is sent to storage later on.
+
 ### 2.1 Create a `.pem` Key File Locally
 ----------------------------------------
 
