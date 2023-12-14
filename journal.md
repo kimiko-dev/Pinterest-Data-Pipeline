@@ -156,6 +156,14 @@ To do this (in the __EC2 client__) I navigated to `/home/ec2-user/kafka_2.12-2.8
 ## 3. Connect a MSK Cluster to a S3 Bucket
 ------------------------------------------
 
+<ins>__Overview__</ins> :
+
+Created a __custom MSK plugin__ using __Confluent.io Amazon S3 Connector__, then established it as a __connector__ in __MSK Connect__ using the correct __configuration settings__. 
+
+<ins>__Fundamental Importance__</ins> :
+
+The __plugin__ makes use of the __Amazon S3 Sink connector__, which exports the data from __Kafka topics__ to __S3 buckets__ in __JSON__ formats (in my case at least, as it supports other formats such as __Avro__ and __Bytes__).
+
 ### 3.1 Create a Custom Plugin with MSK Connect
 -------------------------------------------------
 
@@ -194,7 +202,15 @@ I then proceeded to create the __Cluster connector__ after going through all the
 ## 4. Configuring an API in API Gateway
 ---------------------------------------
 
-For this project, I did not need to create my own __API__ since one had already been made for me. However, I still needed to configure it. 
+__NOTE__: For this project, I did not need to create my own __API__ since one had already been made for me. However, I still needed to configure it. 
+
+<ins>__Overview__</ins> :
+
+In this section, I built a __Kafka REST proxy integration__ method, set up the __Kafka REST proxy__ on the __client EC2 machine__, and sent data to the __API__.
+
+<ins>__Fundamental Importance__</ins> :
+
+__Kafka REST proxy integration__ enables __Kafka producers__ on the __client EC2 machine__ to capture the data sent to the __API__ and processes it into __Kafka topics__ for storage.
 
 ### 4.1 Building a Kafka REST Proxy Integration Method for the API
 ------------------------------------------------------------------
@@ -240,7 +256,15 @@ Here, I edited the [`user_posting_emulation.py`](https://github.com/kimiko-dev/P
 ## 5. Setting up Databricks
 ---------------------------
 
-Before I was able to clean the data, I needed to read the data from my __S3 bucket__ into __Databricks__. This can be done by mounting the desired __S3 bucket__ to __Databricks__.
+__NOTE__: Before I was able to clean the data, I needed to read the data from my __S3 bucket__ into __Databricks__. This can be done by mounting the desired __S3 bucket__ to __Databricks__.
+
+<ins>__Overview__</ins> :
+
+In this step I simply __mounted__ the __S3 buckets__ containing __Kafka topic__ data to __Databricks__.
+
+<ins>__Fundamental Importance__</ins> :
+
+__Databricks__ is the preffered __cloud platform__ for data __transformation__ the data since it utilises __Spark__ natively. As part of this step, we access the __Kafka topic__ data for __transformation tasks__.
 
 ### 5.1 Mounting a S3 Bucket to Databricks
 ------------------------------------------
@@ -293,10 +317,20 @@ Since I have three __Kafka Topics__ which correspond to three different paths in
 
 I ran the whole code and it returned `True`, meaning it was successfully mounted.
 
+The __notebook__ I used to __mount__ the __S3 buckets__ is [`mount_s3_buckets.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/mount_s3_buckets.ipynb).
+
 ## 6. Data Cleaning and SQL Queries Using Spark on Databricks
 -------------------------------------------------------------
 
-(made a new notebook here, need this for later)
+<ins>__Overview__</ins> :
+
+In this section, I simply __cleaned__ and __queried__ the data using __Spark__ on __Databricks__.
+
+<ins>__Fundamental Importance__</ins> :
+
+Cleaning the data is necessary when querying the data effectively. For example, in the __`pin table`__, we had abbriviated follower counts (like `100k`). To implement __data aggregation__ through __queries__, it was necessary to convert these values into integers.
+
+For details on all of the __transformations__, please consult the __notebook__ [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb).
 
 ### 6.1 Data Cleaning
 ---------------------
@@ -311,6 +345,9 @@ df = spark.read.format(file_type) \
 .option("inferSchema", infer_schema) \
 .load(file_location)
 ```
+
+The file for
+
 In the below subsections, I will explain how I cleaned each dataframe.
 
 #### 6.1.1 Cleaning the Pinterest Post Data
@@ -369,12 +406,18 @@ I utilised the native __pyspark__ integration on __Databricks__  to create the q
 - Find the median follower count of users have joined between 2015 and 2020.
 - Find the median follower count of users that have joined between 2015 and 2020, based on which age group they are part of.
 
-You can find the __Databricks Notebook__ for __cleaning__ and __querying__ here: [`batch_processing.ipynb`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Databricks_notebooks/batch_processing.ipynb).
-
 ## 7. AWS MWAA
 --------------
 
-In this section, I did not need to create a __S3 Bucket__ for __MWAA__, and I also did not need to create a __MWAA environment__ since these had already been made for me. 
+__NOTE__: In this section, I did not need to create a __S3 Bucket__ for __MWAA__, and I also did not need to create a __MWAA environment__ since these had already been made for me. 
+
+<ins>__Overview__</ins> :
+
+I created a __DAG__, uploaded it to a __MWAA environment__ and __triggered__ it so it runs on __Databricks Notebooks__
+
+<ins>__Fundamental Importance__</ins> :
+
+Deploying a __DAG__ (Directed Acyclic Graph) on __MWAA__ allows us to __orchestrate__ and __automate__ __workflows__. By __triggering__ the __DAG__, we initiate and execute processes on the __Databricks Notebook__ which ensures the reproducibility and reliability of data workflows.
 
 ### 7.1 Create and Upload a DAG to a MWAA Environment
 -----------------------------------------------------
@@ -430,6 +473,14 @@ First, I navigated to the __MWAA console__, and in the __Environments__ section,
 
 ## 8 AWS Kinesis
 ----------------
+
+<ins>__Overview__</ins> :
+
+In this process, I established __data streams__ in __Amazon Kinesis__, configured my __API__ with __Kinesis proxy integration__, sent data to the __Kinesis streams__, read the data from the __Kinesis streams__ in __Databricks__, applied __transformations__ to the data in the __Kinesis streams__ and finally wrote the __Streaming data__ to __Delta Tables__ on __Databricks__. 
+
+<ins>__Fundamental Importance__</ins> :
+
+__Kinesis data streams__ allow us to ingest and process the __streaming data__ in real-time. But for the __streams__ to pick up the real-time data, we have to first configure __Kinesis proxy integration__ on the __API__ as this has been set up to direct the incoming data into the prescribed streams. Once all of this was set up, we can move to __Databricks__ which reads the __Kinesis streams__ and extracts the data ready to be __transformed__. After applying __transformations__ to the data, it was written to __Delta Tables__ on __Databricks__ which provide long time storage, where the data can undergo further analysis such as __ACID transformations__.
 
 ### 8.1 Create Data Streams Using Kinesis Data Streams
 ------------------------------------------------------
