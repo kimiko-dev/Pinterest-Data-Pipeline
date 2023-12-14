@@ -91,7 +91,7 @@ In the below sections, you will find a brief overview of the tasks completed and
 
 Now, without further ado, lets dive in!
 
-<sub>(P.S. I hope you enjoy your stay, it will be a long one. I recommend equiping some snacks and beverages of your choice!)</sub>
+<sub>(P.S. I hope you enjoy your stay, it will be a long one. I recommend equipping some snacks and beverages of your choice!)</sub>
 
 ## 2. Configuring the EC2 Kafka Client
 --------------------------------------
