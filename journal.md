@@ -75,6 +75,10 @@
 
     8.6 [Write the Streaming Data to Delta Tables](#86-write-the-streaming-data-to-delta-tables)
 
+9. [Implemented Improvements](#9-implemented-improvements)
+
+    9.1 [User Posting Emulation Script(s)](#91-user-posting-emulation-scripts)
+
 
 ## 1. Introduction
 ------------------
@@ -681,7 +685,14 @@ For the docstrings, please see [`stream_processing.ipynb`](https://github.com/ki
 
 ------
 
+## 9 Implemented Improvements
 
+### 9.1 User Posting Emulation Script(s)
 
+As suggested, I concatenated the two scripts [`user_posting_emulation_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_streaming.py) and [`user_posting_emulation.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation.py) into one called [`user_posting_emulation_batch_and_streaming.py`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/Posting_emulation_scripts/user_posting_emulation_batch_and_streaming.py). This script has increased functionality by combining the methods for sending the streaming and batch data to the API. It asks for a user input, where they specify if they want to use either the batch or streaming functionality.
+
+I also made this script read a `YAML` file which contains the `Invoke URL` for the `API` as well as the __S3 Bucket__ names and __Kinesis Stream__ names as these are sensitive information. It also makes it easier to change these details in the future if for example, the `Invoke URL` changes.
+
+On top of this, I made a function which pulls rows from the appropriate RDS table since this had been repeated multiple times in the old scripts, and it is always best to refactor code into a function whenever possible.
 
 <sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appreciate you finding me here! As a reward, take this :star2:)</sub>
