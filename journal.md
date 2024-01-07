@@ -701,4 +701,13 @@ On top of this, I made a function which pulls rows from the appropriate RDS tabl
 
 I removed redundant imports which were a left over artifact from a diferent implementation approach.
 
+### 9.3 `mount_s3_buckets` Databricks Notebook
+
+Here, I made two functions which provide scalability. The functions are: 
+
+- Reading the AWS credentials stored on Databricks 
+- Mounting the S3 bucket to databricks.
+
+By employing these functions, one can easily mount more s3 buckets if needed, as it eliminates the need to repeat code. I.e. makes the notebook scalable. 
+
 <sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appreciate you finding me here! As a reward, take this :star2:)</sub>
