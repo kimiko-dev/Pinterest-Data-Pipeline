@@ -273,8 +273,9 @@ Below is the file structure for the GitHub repo. I have included as many files a
 │   ├── Pinterest_Data.png
 │   └── Streaming_Architecture.png
 ├── Posting_emulation_scripts
-│   ├── user_posting_emulation.py # Emulates posting data for batch processing
-│   └── user_posting_emulation_streaming.py # Emulates posting data for streaming
+│   ├── user_posting_emulation.py # redundant
+│   └── user_posting_emulation_streaming.py # redundant
+│   └── user_posting_emulation_batch_and_streaming.py # combines the two emulation scripts into one, with improved functionality
 ├── <IAM_username>_dag.py # The DAG used on MWAA
 ├── README.md
 ├── journal.md
