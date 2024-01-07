@@ -79,6 +79,8 @@
 
     9.1 [User Posting Emulation Script(s)](#91-user-posting-emulation-scripts)
 
+    9.2 [`batch_processing` Databricks Notebook](#92-batch_processing-databricks-notebook)
+
 
 ## 1. Introduction
 ------------------
@@ -694,5 +696,9 @@ As suggested, I concatenated the two scripts [`user_posting_emulation_streaming.
 I also made this script read a `YAML` file which contains the `Invoke URL` for the `API` as well as the __S3 Bucket__ names and __Kinesis Stream__ names as these are sensitive information. It also makes it easier to change these details in the future if for example, the `Invoke URL` changes.
 
 On top of this, I made a function which pulls rows from the appropriate RDS table since this had been repeated multiple times in the old scripts, and it is always best to refactor code into a function whenever possible.
+
+### 9.2 `batch_processing` Databricks Notebook
+
+I removed redundant imports which were a left over artifact from a diferent implementation approach.
 
 <sub>(Thank you for reading this journal! What a journey it has been from writing the code to all the documentation. This journal took a very long time to write, so I appreciate you finding me here! As a reward, take this :star2:)</sub>
