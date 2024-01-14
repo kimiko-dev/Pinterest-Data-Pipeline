@@ -264,6 +264,8 @@ Below are some questions one could run queries on:
 Below is the file structure for the GitHub repo. I have included as many files as possible. But as I mentioned before, since most of the project is done on the cloud, please consult [`journal.md`](https://github.com/kimiko-dev/Pinterest-Data-Pipeline/blob/master/journal.md) for further discussions to what I did in the project.
 
 ```
+Local Machine
+
 ├── Databricks_notebooks
 │   ├── batch_processing.ipynb
 │   ├── mount_s3_buckets.ipynb
@@ -279,5 +281,20 @@ Below is the file structure for the GitHub repo. I have included as many files a
 ├── <IAM_username>_dag.py # The DAG used on MWAA
 ├── README.md
 ├── journal.md
+
+
+EC2 Instance
+
+├── kafka_2.12-2.8.1
+│   ├── bin
+│   │   └── client.properties
+│   └── libs
+│       └── aws-msk-iam-auth-1.1.5-all.jar
+├── kafka-connect-s3
+│   └── confluentinc-kafka-connect-s3-10.0.3.zip
+└── confluent-7.2.0
+    └── etc
+        └── kafka-rest
+            └── kafka-rest.properties
 
 ```
